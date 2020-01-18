@@ -18,11 +18,14 @@ class MississippiStud:
 	bet_amount = 10
 	#[0] = Ante bet, [1] = 3rd street bet, [2] = 4th street bet, [3] = 5th street bet
 	bets = [0,0,0,0]
+	fold = False
 
 	deck = []
 	board = []
 	player_hand = []
 	# dealer_hand = []
+
+
 
 
 	#format: "index = hand value"
@@ -90,32 +93,32 @@ class MississippiStud:
 		if(choice==2):
 			# print("Nothing here, yet")
 			player_hands = [
-			# ["14s", "14c"],
-			# ["14s", "13c"],
-			# ["14s", "12c"],
-			# ["14s", "11c"],
-			# ["14s", "10c"],
-			# ["14s", "9c"],
-			# ["14s", "8c"],
-			# ["14s", "7c"],
-			# ["14s", "6c"],
-			# ["14s", "5c"],
-			# ["14s", "4c"],
-			# ["14s", "3c"],
-			# ["14s", "2c"],
+			["14s", "14c"],
+			["14s", "13c"],
+			["14s", "12c"],
+			["14s", "11c"],
+			["14s", "10c"],
+			["14s", "9c"],
+			["14s", "8c"],
+			["14s", "7c"],
+			["14s", "6c"],
+			["14s", "5c"],
+			["14s", "4c"],
+			["14s", "3c"],
+			["14s", "2c"],
 
-			# ["13s", "13c"],
-			# ["13s", "12c"],
-			# ["13s", "11c"],
-			# ["13s", "10c"],
+			["13s", "13c"],
+			["13s", "12c"],
+			["13s", "11c"],
+			["13s", "10c"],
 			["13s", "9c"],
-			# ["13s", "8c"],
-			# ["13s", "7c"],
-			# ["13s", "6c"],
-			# ["13s", "5c"],
-			# ["13s", "4c"],
-			# ["13s", "3c"],
-			# ["13s", "2c"],
+			["13s", "8c"],
+			["13s", "7c"],
+			["13s", "6c"],
+			["13s", "5c"],
+			["13s", "4c"],
+			["13s", "3c"],
+			["13s", "2c"],
 
 			# ["12s", "12c"],
 			# ["12s", "11c"],
@@ -205,7 +208,11 @@ class MississippiStud:
 	"""
 	simulates one game given the starting player_hand
 	"""
-	def simulate(self, player_hand):
+	def simulate(self, player_hand=[]):
+
+		if len(player_hand)!=0:
+			print("Player hand: "+str(player_hand))
+
 
 		self.reset()
 
@@ -235,6 +242,12 @@ class MississippiStud:
 			self.deck.pop(self.deck.index(self.player_hand[0]))
 			self.deck.pop(self.deck.index(self.player_hand[1]))
 
+
+
+			#if you saw that another player has an ace
+			self.deck.pop(self.deck.index("14h"))
+
+
 			#deal rest of cards
 			self.deal()
 
@@ -248,23 +261,18 @@ class MississippiStud:
 
 
 
+			#if player folded, just skip to the next hand
+			if self.fold:
+				num_dealer_wins += 1
+				continue 
+
+
+
 			# dealer_hand_strength = self.determine_hand_strength(self.board, self.dealer_hand)
 			player_hand_strength = self.determine_hand_strength(self.board, self.player_hand)
 
-
-			# winner = self.winner(player_hand_strength, dealer_hand_strength)
-
 			#1 if player won, 0 if push, -1 if player lost
 			player_won = self.did_player_win(self.board, player_hand)
-
-
-
-
-
-			# #pay player their blind if they have straight or greater
-			# blind_payout = self.blind_payout[player_hand_strength[0]][1]
-			# self.bankroll += self.bets[2]*blind_payout
-			# # print("Blind payout: $"+str(self.bets[2]*blind_payout))
 
 
 
@@ -283,13 +291,9 @@ class MississippiStud:
 				num_dealer_wins += 1
 
 
-			# #pay player their play bet
-			# self.bankroll += self.bets[3]*2
-			# # print("Play payout: $"+str(self.bets[3]*2))
 
 
-
-			if x!=0 and x%1000 == 0:
+			if x!=0 and x%100000 == 0:
 				print("Hand #"+str(x))
 
 
@@ -386,37 +390,43 @@ class MississippiStud:
 
 		sorted_player_hand = sorted(self.player_hand)
 
-		self.bet(0, self.bet_amount)
-		self.bet(1, self.bet_amount*3)
-		self.bet(2, self.bet_amount*3)
-		self.bet(3, self.bet_amount*3)
+		# self.bet(0, self.bet_amount)
+		# self.bet(1, self.bet_amount*3)
+		# self.bet(2, self.bet_amount*3)
+		# self.bet(3, self.bet_amount*3)
 
-		return
+		# return
+
+		hand_strength = self.determine_hand_strength(board=[], hand=self.player_hand)
 
 
 		###
 		#bets 3rd street
 		#To bet 3rd street, you can only see your cards, which is street="ante"
 		# Strategy
-		# Raise 3x with any pair.
-		# Raise 1x with at least two points.
-		# Raise 1x with 6/5 suited.
+		# - Raise 3x with any pair.
+		# - Raise 1x with at least two points.
+		# - Raise 1x with 6/5 suited.
 		# Fold all others.
 
 		bet_amount = 0
 
 		points = self.get_num_points(street="ante")
 
+		#Raise 3x with any pair
+		# if hand_strength[0]==1:
+		# 	bet_amount = self.bet_amount*3
+		if hand_strength[0] >= 2 or (hand_strength[0]==1 and hand_strength[1][0]>=6):
+			bet_amount = self.bet_amount*3
 		#raise 1x with at least 2 points
-		if points>=2:
+		elif points>=2:
 			bet_amount = self.bet_amount
 		#Raise 1x with 6/5 suited
 		elif sorted_player_hand[0][0]==5 and sorted_player_hand[1][0]==6 and sorted_player_hand[0][1]==sorted_player_hand[1][1]:
 			bet_amount = self.bet_amount
-		
-		#Raise 3x with any pair
-		if self.determine_hand_strength(board=[], hand=self.player_hand)[0]==1:
-			bet_amount = self.bet_amount*3
+		else:
+			self.fold = True
+			return
 
 		# self.bets[1] = bet_amount
 		self.bet(1, bet_amount)
@@ -425,52 +435,104 @@ class MississippiStud:
 
 
 		###
-		# bets 4th street
-		# To bet 4th street, you can only see your cards and the first board card, which is street="4th"
-		# Raise 3x with any made hand (mid pair or higher).
-		# Raise 3x with royal flush draw.
-		# Raise 3x with straight flush draw, with no gaps, 567 or higher.
-		# Raise 3x with straight flush draw, with one gap, and at least one high card.
-		# Raise 3x with straight flush draw, with two gaps, and at least two high cards.
-		# Raise 1x with any other three suited cards.
-		# Raise 1x with a low pair.
-		# Raise 1x with at least three points.
+		# bets 2nd street
+		# To bet 2nd street, you can only see your cards and the first board card, which is street="3rd"
+		# - Raise 3x with any made hand (mid pair or higher).
+		# ?- Raise 3x with royal flush draw.
+		# ?- Raise 3x with straight flush draw, with no gaps, 567 or higher.
+		# ?- Raise 3x with straight flush draw, with one gap, and at least one high card.
+		# ?- Raise 3x with straight flush draw, with two gaps, and at least two high cards.
+		# - Raise 1x with any other three suited cards.
+		# - Raise 1x with a low pair.
+		# - Raise 1x with at least three points.
 		# Raise 1x with a straight draw, with no gaps, 456 or higher.
 		# Raise 1x with a straight draw, with one gap, and two mid cards.
-		# Fold all others.
+		# - Fold all others.
 
 		bet_amount = 0
 
-		#1 if player won, 0 if push, -1 if player lost
-		player_won = self.did_player_win(self.board, self.player_hand)
-
 		points = self.get_num_points(street="3rd")
 
+		hand_strength = self.determine_hand_strength(board=[self.board[0]], hand=self.player_hand)
 
-		# Raise 3x with any made hand
-		if player_won == 1 or player_won == 0:
+		#Raise 3x with any made hand (mid pair or higher)
+		if hand_strength[0] >= 2 or (hand_strength[0]==1 and hand_strength[1][0]>=6):
 			bet_amount = self.bet_amount*3
+		#Raise 1x with a low pair
+		elif hand_strength[0]==1:
+			bet_amount = self.bet_amount
+		#raise 1x with at least 3 points
+		elif points>=3:
+			bet_amount = self.bet_amount
+		#Raise 1x with any other three suited cards
+		elif self.get_suit(self.player_hand[0])==self.get_suit(self.player_hand[1]) and self.get_suit(self.player_hand[1])==self.get_suit(self.board[0]):
+			bet_amount = self.bet_amount
+		#Fold all others
+		else:
+			self.fold = True
+			return
+
+		self.bet(2, bet_amount)
+
+
+
+		###
+		# bets 4 Cards (3rd street)
+		# To bet 3rd street, you can only see your cards and the first two board cards, which is street="4th"
+		# - Raise 3x with any made hand (mid pair or higher).
+		# - Raise 3x with any four to a flush.
+		# Raise 3x with four to an outside straight, 8 high or better.
+		# Raise 1x with any other straight draw.
+		# - Raise 1x with a low pair.
+		# - Raise 1x with at least four points.
+		# - Raise 1x with three mid cards and at least one previous 3x raise.
+		# - Fold all others.
+
+		bet_amount = 0
+
+		points = self.get_num_points(street="4th")
+
+		hand_strength = self.determine_hand_strength(board=self.board[0:2], hand=self.player_hand)
 
 		
-
-
-		#raise 1x with at least 2 points
-		if points>=2:
-			bet_amount = self.bet_amount
-		#Raise 1x with 6/5 suited
-		elif sorted_player_hand[0][0]==5 and sorted_player_hand[1][0]==6 and sorted_player_hand[0][1]==sorted_player_hand[1][1]:
-			bet_amount = self.bet_amount
-		#Raise 3x with any pair
-		elif self.determine_hand_strength(board=[], hand=self.player_hand)[0]==1:
+		#Raise 3x with any made hand (mid pair or higher)
+		if hand_strength[0] >= 2 or (hand_strength[0]==1 and hand_strength[1][0]>=6):
 			bet_amount = self.bet_amount*3
+		#Raise 3x with any four to a flush
+		elif self.get_suit(self.player_hand[0])==self.get_suit(self.player_hand[1]) and \
+			self.get_suit(self.player_hand[1])==self.get_suit(self.board[0]) and \
+			self.get_suit(self.player_hand[1])==self.get_suit(self.board[1]):
+			bet_amount = self.bet_amount*3
+		#Raise 1x with a low pair
+		elif hand_strength[0]==1:
+			bet_amount = self.bet_amount
+		#raise 1x with at least 4 points or Raise 1x with three mid cards and at least one previous 3x raise
+		elif points>=4 or (points>=3 and self.bet_amount*3 in self.bets):
+			bet_amount = self.bet_amount
+		#Fold all others
+		else:
+			self.fold = True
+			return
+
+		self.bet(3, bet_amount)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 		### For testing ###
-		# self.bets[2] = self.bets[1]
-		# self.bets[3] = self.bets[2]
-		self.bet(2, self.bets[1])
-		self.bet(3, self.bets[2])
+		# self.bet(2, self.bets[1])
+		# self.bet(3, self.bets[2])
 
 
 
@@ -544,16 +606,15 @@ class MississippiStud:
 	places player's initial bets
 	"""
 	def initial_bets(self):
+		self.fold = False
 
-		# #sets ante
-		# self.bets[0] = self.bet
-		# # self.bets[1] = self.bet
-		# # self.bets[2] = self.bet
-
-		# #subtracts bets from the player's overall bankroll
-		# self.bankroll -= sum(self.bets)
-
+		#ante bet
 		self.bet(0, self.bet_amount)
+
+		#reset the rest of the streets
+		self.bets[1] = 0
+		self.bets[2] = 0
+		self.bets[3] = 0
 
 	"""
 	player makets bet of size amount at time street
@@ -682,9 +743,13 @@ class MississippiStud:
 
 			#gets highest card in play
 			kicker=self.get_kicker_indices(cards, 1)
-			kicker=kicker[0]
+			# kicker=kicker[0]
 
-			return [7, [quads, kicker] ]
+			extra = [quads]
+			for x in range(0, min(1, len(kicker))):
+				extra.append(kicker)
+
+			return [7, extra]
 
 		#if full house
 		if (3 in cards and 2 in cards) or cards.count(3)==2:
@@ -738,8 +803,11 @@ class MississippiStud:
 
 			#returns highest 2 cards not part of trips
 			kickers=self.get_kicker_indices(cards, 2)
+			extra = [trips]
+			for x in range(0, min(2, len(kickers))):
+				extra.append(kickers[x])
 
-			return [3, [trips, kickers[0], kickers[1]]]
+			return [3, extra]
 
 		#if 2 pair
 		if cards.count(2)>=2:
@@ -756,10 +824,14 @@ class MississippiStud:
 			cards[highest2]=0
 
 			#gets high card
-			kicker=self.get_kicker_indices(cards, 1)
-			kicker=kicker[0]
+			kicker = self.get_kicker_indices(cards, 1)
+			# kicker = kicker[0]
+			extra = [highest1, highest2]
 
-			return [2, [highest1, highest2, kicker]]
+			for x in range(0, min(1, len(kicker))):
+				extra.append(kicker[x])
+
+			return [2, extra]
 
 		#if regular pair
 		if cards.count(2)==1:
@@ -875,6 +947,10 @@ class MississippiStud:
 			return card
 
 		return after[index]
+
+	#gets the suit from the card
+	def get_suit(self, card):
+		return card[-1:]
 
 
 	#converts 25.000000000000000001 to 25.0
