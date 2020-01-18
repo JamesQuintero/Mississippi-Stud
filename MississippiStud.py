@@ -15,7 +15,7 @@ class MississippiStud:
 	#buy-in for $100
 	bankroll = 100
 	#min-bet is $15
-	bet = 10
+	bet_amount = 10
 	#[0] = Ante bet, [1] = 3rd street bet, [2] = 4th street bet, [3] = 5th street bet
 	bets = [0,0,0,0]
 
@@ -38,7 +38,7 @@ class MississippiStud:
 	#9 = royal flush
 	#index corresponds to hand strength, [index] is amount to multiply bet by
 	payout=[
-	1, #pushes, 0/1 + 1
+	0, #pushes, 0/1 + 1
 	2, #pays 1 to 1, 1/1 + 1
 	3, #pays 2 to 1, 2/1 + 1
 	4, #pays 3 to 1, 3/1 + 1
@@ -50,6 +50,8 @@ class MississippiStud:
 	501 #pays 500 to 1, 500/1 + 1
 	]
 
+	#if true, print statements are printed
+	verbose = True
 
 
 	
@@ -60,8 +62,11 @@ class MississippiStud:
 		self.board = [""]*3
 		self.player_hand = [""]*2
 
+		self.verbose = False
+
 	def reset(self):
-		self.bankroll = 100
+		# self.bankroll = 100
+		self.bankroll = 1000000
 
 
 	def run(self):
@@ -84,7 +89,7 @@ class MississippiStud:
 		#simulate
 		if(choice==2):
 			# print("Nothing here, yet")
-			# player_hands = [
+			player_hands = [
 			# ["14s", "14c"],
 			# ["14s", "13c"],
 			# ["14s", "12c"],
@@ -103,7 +108,7 @@ class MississippiStud:
 			# ["13s", "12c"],
 			# ["13s", "11c"],
 			# ["13s", "10c"],
-			# ["13s", "9c"],
+			["13s", "9c"],
 			# ["13s", "8c"],
 			# ["13s", "7c"],
 			# ["13s", "6c"],
@@ -186,11 +191,11 @@ class MississippiStud:
 
 			# ["3s", "3c"],
 			# ["3s", "2c"]
-			# ]
+			]
 
-			# for x in range(0, len(player_hands)):
-				# self.simulate(player_hands[x])
-			self.simulate([])
+			for x in range(0, len(player_hands)):
+				self.simulate(player_hands[x])
+			# self.simulate([])
 
 		#print best strategy
 		if(choice==3):
@@ -208,8 +213,8 @@ class MississippiStud:
 		num_dealer_wins = 0
 		num_pushes = 0
 
-		num_runs=100000
-		# num_runs = 1
+		# num_runs=1
+		num_runs = 1000000
 
 		# while(True):
 		for x in range(0, num_runs):
@@ -221,14 +226,14 @@ class MississippiStud:
 			self.initial_bets()
 
 			
-			#player gets random cards
-			self.player_hand[0] = self.deck.pop()
-			self.player_hand[1] = self.deck.pop()
+			# #player gets random cards
+			# self.player_hand[0] = self.deck.pop()
+			# self.player_hand[1] = self.deck.pop()
 
 			#player gets certain cards
-			# self.player_hand = player_hand
-			# self.deck.pop(self.deck.index(self.player_hand[0]))
-			# self.deck.pop(self.deck.index(self.player_hand[1]))
+			self.player_hand = player_hand
+			self.deck.pop(self.deck.index(self.player_hand[0]))
+			self.deck.pop(self.deck.index(self.player_hand[1]))
 
 			#deal rest of cards
 			self.deal()
@@ -250,7 +255,7 @@ class MississippiStud:
 			# winner = self.winner(player_hand_strength, dealer_hand_strength)
 
 			#1 if player won, 0 if push, -1 if player lost
-			player_won = self.did_player_win(board, player_hand)
+			player_won = self.did_player_win(self.board, player_hand)
 
 
 
@@ -263,18 +268,18 @@ class MississippiStud:
 
 
 
-			#player won
-			if player_won == 1:
+			#player wins with pair of jacks or better
+			if player_hand_strength[0] >= 2 or (player_hand_strength[0] == 1 and player_hand_strength[1][0]>=11):
 				num_player_wins += 1
 
 				self.bankroll += sum(self.bets)*self.payout[player_hand_strength[0]]
-			#pushes
-			elif player_won == 0:
+			#pushes with pair of 6s to pair of 10s
+			elif player_hand_strength[0] == 1 and player_hand_strength[1][0]>=6:
 				num_pushes += 1
 
 				self.bankroll += sum(self.bets)
 			#player lost
-			elif player_won == -1:
+			else:
 				num_dealer_wins += 1
 
 
@@ -313,15 +318,15 @@ class MississippiStud:
 	"""
 	def did_player_win(self, board, player_hand):
 		player_won = 0
-		#player won
-		if player_hand_strength[0]>1 or (player_hand_strength[0]==1 and player_hand_strength[1][0]>=11):
-			player_won = 1
-		#player pushed
-		elif player_hand_strength[0]==1 and player_hand_strength[1][0]>=6:
-			player_won = 0
-		#player lost
-		else:
-			player_won = -1
+		# #player won
+		# if player_hand_strength[0]>1 or (player_hand_strength[0]==1 and player_hand_strength[1][0]>=11):
+		# 	player_won = 1
+		# #player pushed
+		# elif player_hand_strength[0]==1 and player_hand_strength[1][0]>=6:
+		# 	player_won = 0
+		# #player lost
+		# else:
+		# 	player_won = -1
 
 		return player_won
 
@@ -375,10 +380,18 @@ class MississippiStud:
 	"""
 	def play_optimally(self):
 
-		print("Player's hand: "+str(self.player_hand))
-		print("Board: "+str(self.board))
+		if self.verbose:
+			print("Player's hand: "+str(self.player_hand))
+			print("Board: "+str(self.board))
 
-		sorted_player_hand = sort(self.player_hand)
+		sorted_player_hand = sorted(self.player_hand)
+
+		self.bet(0, self.bet_amount)
+		self.bet(1, self.bet_amount*3)
+		self.bet(2, self.bet_amount*3)
+		self.bet(3, self.bet_amount*3)
+
+		return
 
 
 		###
@@ -396,15 +409,17 @@ class MississippiStud:
 
 		#raise 1x with at least 2 points
 		if points>=2:
-			bet_amount = self.bet
+			bet_amount = self.bet_amount
 		#Raise 1x with 6/5 suited
 		elif sorted_player_hand[0][0]==5 and sorted_player_hand[1][0]==6 and sorted_player_hand[0][1]==sorted_player_hand[1][1]:
-			bet_amount = self.bet
+			bet_amount = self.bet_amount
+		
 		#Raise 3x with any pair
-		elif self.determine_hand_strength(board=[], hand=self.player_hand)[0]==1:
-			bet_amount = self.bet*3
+		if self.determine_hand_strength(board=[], hand=self.player_hand)[0]==1:
+			bet_amount = self.bet_amount*3
 
-		self.bets[1] = bet_amount
+		# self.bets[1] = bet_amount
+		self.bet(1, bet_amount)
 
 
 
@@ -427,29 +442,35 @@ class MississippiStud:
 		bet_amount = 0
 
 		#1 if player won, 0 if push, -1 if player lost
-		player_won = self.did_player_win(board, player_hand)
+		player_won = self.did_player_win(self.board, self.player_hand)
 
 		points = self.get_num_points(street="3rd")
 
 
 		# Raise 3x with any made hand
 		if player_won == 1 or player_won == 0:
-			bet_amount = self.bet*3
+			bet_amount = self.bet_amount*3
 
 		
 
 
 		#raise 1x with at least 2 points
 		if points>=2:
-			bet_amount = self.bet
+			bet_amount = self.bet_amount
 		#Raise 1x with 6/5 suited
 		elif sorted_player_hand[0][0]==5 and sorted_player_hand[1][0]==6 and sorted_player_hand[0][1]==sorted_player_hand[1][1]:
-			bet_amount = self.bet
+			bet_amount = self.bet_amount
 		#Raise 3x with any pair
 		elif self.determine_hand_strength(board=[], hand=self.player_hand)[0]==1:
-			bet_amount = self.bet*3
+			bet_amount = self.bet_amount*3
 
-		self.bets[1] = bet_amount
+
+
+		### For testing ###
+		# self.bets[2] = self.bets[1]
+		# self.bets[3] = self.bets[2]
+		self.bet(2, self.bets[1])
+		self.bet(3, self.bets[2])
 
 
 
@@ -524,13 +545,22 @@ class MississippiStud:
 	"""
 	def initial_bets(self):
 
-		#sets ante
-		self.bets[0] = self.bet
-		# self.bets[1] = self.bet
-		# self.bets[2] = self.bet
+		# #sets ante
+		# self.bets[0] = self.bet
+		# # self.bets[1] = self.bet
+		# # self.bets[2] = self.bet
 
-		#subtracts bets from the player's overall bankroll
-		self.bankroll -= sum(self.bets)
+		# #subtracts bets from the player's overall bankroll
+		# self.bankroll -= sum(self.bets)
+
+		self.bet(0, self.bet_amount)
+
+	"""
+	player makets bet of size amount at time street
+	"""
+	def bet(self, street, amount):
+		self.bets[street] = amount
+		self.bankroll -= amount
 
 
 
@@ -556,7 +586,7 @@ class MississippiStud:
 		print()
 
 		print("Bankroll: $"+str(self.bankroll))
-		print("Bet size: $"+str(self.bet))
+		print("Bet size: $"+str(self.bet_amount))
 		print()
 
 		print("Ante bet: $"+str(self.bets[0]))
