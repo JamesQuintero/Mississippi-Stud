@@ -6,9 +6,8 @@
 
 #determines best strategy for playing Mississippi Stud
 
-import os.path
-import time
-import sys
+import json
+import copy
 import random
 
 from HandStrength import HandStrength
@@ -19,7 +18,7 @@ class MississippiStud:
     hand_strength = None
 
     #Starting buy-in when sitting down at the table
-    starting_bankroll = 1000
+    starting_bankroll = 1000000
     #min-bet is $15
     bet_amount = 10
     #[0] = Ante bet, [1] = 3rd street bet, [2] = 4th street bet, [3] = 5th street bet
@@ -30,6 +29,7 @@ class MississippiStud:
     board = []
     player_hand = []
     # dealer_hand = []
+    hand_strength_distribution = {}
 
 
 
@@ -76,8 +76,20 @@ class MississippiStud:
         self.verbose = False
 
     def reset(self):
-        # self.bankroll = 100
         self.bankroll = self.starting_bankroll
+
+        self.hand_strength_distribution = {
+            0: 0,
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0,
+            6: 0,
+            7: 0,
+            8: 0,
+            9: 0,
+        }
 
 
     def run(self):
@@ -99,7 +111,7 @@ class MississippiStud:
             num_runs = int(input("Num runs: "))
 
             player_hands = [
-                ["14s", "14c"],
+                # ["14s", "14c"],
                 # ["14s", "13c"],
                 # ["14s", "12c"],
                 # ["14s", "11c"],
@@ -202,8 +214,33 @@ class MississippiStud:
                 # ["3s", "2c"]
             ]
 
+            player_hands = [
+                # ["14s", "10c"],
+                # ["14s", "10c"],
+                # ["14s", "10c"],
+                ["14s", "5c"],
+                ["14s", "5c"],
+                ["14s", "5c"],
+            ]
+
+            cards_to_remove = [
+                [],
+                # ["14h"],
+                # ["14h", "14c"],
+                ["5h"],
+                ["5h", "5s"],
+            ]
+
+            player_hands = [
+                ["7s", "6s"]
+            ]
+            cards_to_remove = [
+                # ["14c", "10c", "8c, 9h", "4s", "11d"]
+                []
+            ]
+
             for x in range(0, len(player_hands)):
-                self.simulate(num_runs, player_hands[x])
+                num_player_wins, num_dealer_wins, num_push, total_profit, ending_bankroll, hand_strengths = self.simulate(num_runs, play_optimally=True, player_hand=player_hands[x], cards_to_remove=cards_to_remove[x])
 
         #print best strategy
         if(choice==3):
@@ -213,10 +250,12 @@ class MississippiStud:
     """
     simulates one game given the starting player_hand
     """
-    def simulate(self, num_runs = 1000000, player_hand=[]):
+    def simulate(self, num_runs = 1000000, play_optimally=True, player_hand=[], cards_to_remove=[]):
 
-        if len(player_hand)!=0:
+        if len(player_hand) != 0:
             print("Starting player hand: "+str(self.convert_cards(player_hand)))
+        if len(cards_to_remove) != 0:
+            print("Cards in other player's hand: {}".format(self.convert_cards(cards_to_remove)))
 
 
         self.reset()
@@ -224,62 +263,23 @@ class MississippiStud:
         num_player_wins = 0
         num_dealer_wins = 0
         num_pushes = 0
+        total_profit = 0
 
         # while(True):
         for x in range(0, num_runs):
 
-            #shuffles the deck of cards
-            self.initialize_deck()
+            starting_bankroll = self.bankroll
 
-            #make bets
-            self.initial_bets()
-
-            
-            # #player gets random cards
-            # self.player_hand[0] = self.deck.pop()
-            # self.player_hand[1] = self.deck.pop()
-
-            #player gets certain cards
-            self.player_hand = player_hand
-            self.deck.pop(self.deck.index(self.player_hand[0]))
-            self.deck.pop(self.deck.index(self.player_hand[1]))
-
-
-
-            #if you saw that another player has an ace
-            self.deck.pop(self.deck.index("14h"))
-
-
-            #deal rest of cards
-            self.deal()
-
-            # #player bets 4x
-            # self.bets[3] = self.bet*4
-            # self.bankroll -= self.bets[3]
-
-
-            #player bets optimally, according to wizard-of-odds
-            self.play_optimally()
-
-
-
-            #if player folded, just skip to the next hand
-            if self.fold:
-                num_dealer_wins += 1
-                continue 
-
-
-
-            # dealer_hand_strength = self.determine_hand_strength(self.board, self.dealer_hand)
-            player_hand_strength = self.hand_strength.determine_hand_strength(self.board, self.player_hand)
+            winner = self.simulate_single(play_optimally, player_hand, cards_to_remove)
 
             #player wins with pair of jacks or better
-            if player_hand_strength[0] >= 2 or (player_hand_strength[0] == 1 and player_hand_strength[1][0]>=11):
+            if winner == 1:
                 num_player_wins += 1
+                player_hand_strength = self.hand_strength.determine_hand_strength(self.board, self.player_hand)
                 self.bankroll += sum(self.bets)*self.payout[player_hand_strength[0]]
 
             #pushes with pair of 6s to pair of 10s
-            elif player_hand_strength[0] == 1 and player_hand_strength[1][0]>=6:
+            elif winner == 0:
                 num_pushes += 1
                 self.bankroll += sum(self.bets)
 
@@ -288,9 +288,13 @@ class MississippiStud:
                 num_dealer_wins += 1
 
 
+            ending_bankroll = self.bankroll
+            bankroll_diff = ending_bankroll - starting_bankroll
+            total_profit += bankroll_diff
 
 
-            if x!=0 and x%100000 == 0:
+
+            if x != 0 and x % 100000 == 0:
                 print("Hand #"+str(x))
 
 
@@ -298,18 +302,82 @@ class MississippiStud:
         # print("Player hand: "+str(player_hand))
         self.print_bankroll_state()
 
-
-        print("Num player wins: "+str(num_player_wins))
-        print("Num dealer wins: "+str(num_dealer_wins))
-        print("Num pushes: "+str(num_pushes))
-
-        print("Win %: "+str(num_player_wins/(num_player_wins+num_dealer_wins+num_pushes)*100))
-        print("Lose %: "+str(num_dealer_wins/(num_player_wins+num_dealer_wins+num_pushes)*100))
-        print("Push %: "+str(num_pushes/(num_player_wins+num_dealer_wins+num_pushes)*100))
-
+        print("Num player wins: {:,}".format(num_player_wins))
+        print("Num dealer wins: {:,}".format(num_dealer_wins))
+        print("Num pushes: {:,}".format(num_pushes))
+        print("Win %: {:.2f}%".format(num_player_wins/num_runs*100))
+        print("Lose %: {:.2f}%".format(num_dealer_wins/num_runs*100))
+        print("Push %: {:.2f}%".format(num_pushes/num_runs*100))
+        print("Avg return per hand: ${:,.2f}".format(total_profit/num_runs))
         print()
+        self.print_hand_strength_distribution(num_runs)
         print()
 
+        return num_player_wins, num_dealer_wins, num_pushes, total_profit, self.bankroll, copy.deepcopy(self.hand_strength_distribution)
+
+
+    """
+    Returns 1 if player wins, -1 if dealer wins, and 0 if push
+    """
+    def simulate_single(self, play_optimally=True, player_hand=None, cards_to_remove=[]):
+
+        #shuffles the deck of cards
+        self.initialize_deck()
+
+        #make bets
+        self.initial_bets()
+
+        #player gets random cards
+        if player_hand == None:
+            self.player_hand[0] = self.deck.pop()
+            self.player_hand[1] = self.deck.pop()
+
+        #player gets certain cards
+        self.player_hand = player_hand
+        self.deck.pop(self.deck.index(self.player_hand[0]))
+        self.deck.pop(self.deck.index(self.player_hand[1]))
+
+        #Remove cards that you would see in other player's hands
+        for card in cards_to_remove:
+            try:
+                self.deck.pop(self.deck.index(card))
+            except:
+                pass
+
+
+        #deal rest of cards
+        self.deal()
+
+        if play_optimally:
+            #player bets optimally, according to wizard-of-odds
+            self.play_optimally()
+        else:
+            self.play_until_end()
+
+
+
+        #if player folded, just skip to the next hand
+        if self.fold:
+            return -1
+
+
+
+        # dealer_hand_strength = self.determine_hand_strength(self.board, self.dealer_hand)
+        player_hand_strength = self.hand_strength.determine_hand_strength(self.board, self.player_hand)
+
+        self.hand_strength_distribution[player_hand_strength[0]] += 1
+
+        #player wins with pair of jacks or better
+        if player_hand_strength[0] >= 2 or (player_hand_strength[0] == 1 and player_hand_strength[1][0]>=11):
+            return 1
+
+        #pushes with pair of 6s to pair of 10s
+        elif player_hand_strength[0] == 1 and player_hand_strength[1][0]>=6:
+            return 0
+
+        #player lost
+        else:
+            return -1
 
 
     # def test(self):
@@ -337,11 +405,9 @@ class MississippiStud:
 
         sorted_player_hand = sorted(self.player_hand)
 
-
         success = self.bet_3rd_street(sorted_player_hand)
         if not success:
             return 
-
 
         success = self.bet_4th_street()
         if not success:
@@ -349,15 +415,24 @@ class MississippiStud:
 
         success = self.bet_5th_street()
         if not success:
-            return 
+            return
 
 
+    """
+    Plays and never folds.
+    Bets minimum, although this method should only be used to calculate win-rate and not avg return. 
+    """
+    def play_until_end(self):
 
+        if self.verbose:
+            print("Player's hand: "+str(self.player_hand))
+            print("Board: "+str(self.board))
 
+        sorted_player_hand = sorted(self.player_hand)
 
-        ### For testing ###
-        # self.bet(2, self.bets[1])
-        # self.bet(3, self.bets[2])
+        self.bet(1, self.bet_amount)
+        self.bet(2, self.bet_amount)
+        self.bet(3, self.bet_amount)
         
 
     """
@@ -621,7 +696,7 @@ class MississippiStud:
     def print_bankroll_state(self):
         print()
         print("Starting bankroll: ${:,}".format(self.starting_bankroll))
-        print("Bankroll: ${:,}".format(self.bankroll))
+        print("Bankroll: ${:,.2f}".format(self.bankroll))
         print("Bet size: ${:,}".format(self.bet_amount))
         print()
         
@@ -632,6 +707,19 @@ class MississippiStud:
         print("Board: {},{},{}".format(self.convert_card(self.board[0]), self.convert_card(self.board[1]), self.convert_card(self.board[2])))
         print("player hand: {},{}".format(self.convert_card(self.player_hand[0]), self.convert_card(self.player_hand[1])))
         print()
+        
+
+    def print_hand_strength_distribution(self, num_runs=None):
+        #If don't specify number of runs, just print raw values
+        if not num_runs:
+            print(json.dumps(self.hand_strength_distribution, sort_keys=True, indent=4, default=str))
+        #Print out rate that each hand type occurred
+        else:
+            new_hand_distribution = {}
+            for key in self.hand_strength_distribution:
+                new_hand_distribution[self.convert_hand_strength(key)] = "{:.2f}%".format(self.hand_strength_distribution[key]/num_runs*100)
+            print(json.dumps(new_hand_distribution, indent=4, default=str))
+            
 
 
     """
@@ -651,7 +739,11 @@ class MississippiStud:
             9: "Royal Flush"
         }
 
-        return to_return[hand_strength[0]]
+        #If provided in format of HandStrength
+        if isinstance(hand_strength, list):
+            return to_return[hand_strength[0]]
+        else:
+            return to_return[hand_strength]
 
     """
     Creates a random deck of 52 cards

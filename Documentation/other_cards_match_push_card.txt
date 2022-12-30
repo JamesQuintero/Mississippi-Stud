@@ -1,0 +1,84 @@
+Choice: 2
+Num runs: 100000
+Starting player hand: ['As', '10c']
+
+Starting bankroll: $1,000,000
+Bankroll: $730,700.00
+Bet size: $10
+
+Num player wins: 22,854
+Num dealer wins: 59,266
+Num pushes: 17,880
+Win %: 22.85%
+Lose %: 59.27%
+Push %: 17.88%
+Avg return per hand: $-2.69
+
+{
+    "High card": "47.23%",
+    "Pair": "38.58%",
+    "Two pair": "4.05%",
+    "Trips": "1.64%",
+    "Straight": "0.33%",
+    "Flush": "0.00%",
+    "Full House": "0.08%",
+    "Quads": "0.01%",
+    "Straight Flush": "0.00%",
+    "Royal Flush": "0.00%"
+}
+
+Starting player hand: ['As', '10c']
+Cards in other player's hand: ['10h']
+
+Starting bankroll: $1,000,000
+Bankroll: $394,750.00
+Bet size: $10
+
+Num player wins: 22,542
+Num dealer wins: 62,869
+Num pushes: 14,589
+Win %: 22.54%
+Lose %: 62.87%
+Push %: 14.59%
+Avg return per hand: $-6.05
+
+{
+    "High card": "50.56%",
+    "Pair": "36.50%",
+    "Two pair": "3.24%",
+    "Trips": "1.15%",
+    "Straight": "0.35%",
+    "Flush": "0.00%",
+    "Full House": "0.06%",
+    "Quads": "0.01%",
+    "Straight Flush": "0.00%",
+    "Royal Flush": "0.00%"
+}
+
+Starting player hand: ['As', '10c']
+Cards in other player's hand: ['10h', '10s']
+
+Starting bankroll: $1,000,000
+Bankroll: $86,770.00
+Bet size: $10
+
+Num player wins: 22,498
+Num dealer wins: 67,045
+Num pushes: 10,457
+Win %: 22.50%
+Lose %: 67.05%
+Push %: 10.46%
+Avg return per hand: $-9.13
+
+{
+    "High card": "53.93%",
+    "Pair": "33.82%",
+    "Two pair": "2.25%",
+    "Trips": "1.05%",
+    "Straight": "0.35%",
+    "Flush": "0.00%",
+    "Full House": "0.01%",
+    "Quads": "0.01%",
+    "Straight Flush": "0.00%",
+    "Royal Flush": "0.00%"
+}

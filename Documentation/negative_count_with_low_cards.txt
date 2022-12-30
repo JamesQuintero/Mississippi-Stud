@@ -1,0 +1,138 @@
+Assuming counting in Mississippi Stud works the same in blackjack with face cards being worth -1 and 2-5 being worth +1, is there any effect if you see 3+ other players have high cards?
+
+
+
+## If holding until the end and didn't see other player's cards.
+Num runs: 1000000
+Starting player hand: ['7s', '6s']
+
+Starting bankroll: $1,000,000
+Bankroll: $-9,200,560.00
+Bet size: $10
+
+Num player wins: 127,460
+Num dealer wins: 566,837
+Num pushes: 305,703
+Win %: 12.75%
+Lose %: 56.68%
+Push %: 30.57%
+Avg return per hand: $-10.20
+
+{
+    "High card": "51.78%",
+    "Pair": "40.34%",
+    "Two pair": "4.05%",
+    "Trips": "1.58%",
+    "Straight": "1.29%",
+    "Flush": "0.83%",
+    "Full House": "0.09%",
+    "Quads": "0.01%",
+    "Straight Flush": "0.02%",
+    "Royal Flush": "0.00%"
+}
+
+
+
+
+## If holding until the end and other players have a few high cards
+Num runs: 1000000
+Starting player hand: ['7s', '6s']
+Cards in other player's hand: ['Ac', '10c', '8c, 9h', '4s', 'Jd']
+Hand #100000
+Hand #200000
+Hand #300000
+Hand #400000
+Hand #500000
+Hand #600000
+Hand #700000
+Hand #800000
+Hand #900000
+
+Starting bankroll: $1,000,000
+Bankroll: $-8,237,560.00
+Bet size: $10
+
+Num player wins: 128,625
+Num dealer wins: 548,828
+Num pushes: 322,547
+Win %: 12.86%
+Lose %: 54.88%
+Push %: 32.25%
+Avg return per hand: $-9.24
+
+{
+    "High card": "49.91%",
+    "Pair": "41.51%",
+    "Two pair": "4.50%",
+    "Trips": "1.80%",
+    "Straight": "1.35%",
+    "Flush": "0.78%",
+    "Full House": "0.12%",
+    "Quads": "0.01%",
+    "Straight Flush": "0.01%",
+    "Royal Flush": "0.00%"
+}
+
+
+
+
+## If playing optimally and didn't see other player's cards
+Num runs: 1000000
+Starting player hand: ['7s', '6s']
+
+Starting bankroll: $1,000,000
+Bankroll: $-3,814,880.00
+Bet size: $10
+
+Num player wins: 107,050
+Num dealer wins: 658,795
+Num pushes: 234,155
+Win %: 10.71%
+Lose %: 65.88%
+Push %: 23.42%
+Avg return per hand: $-4.81
+
+{
+    "High card": "30.19%",
+    "Pair": "29.16%",
+    "Two pair": "3.48%",
+    "Trips": "1.39%",
+    "Straight": "0.47%",
+    "Flush": "0.84%",
+    "Full House": "0.09%",
+    "Quads": "0.01%",
+    "Straight Flush": "0.02%",
+    "Royal Flush": "0.00%"
+}
+
+
+
+## If playing optimally and other players have a few high cards
+Num runs: 1000000
+Starting player hand: ['7s', '6s']
+Cards in other player's hand: ['Ac', '10c', '8c, 9h', '4s', 'Jd']
+
+Starting bankroll: $1,000,000
+Bankroll: $-2,823,810.00
+Bet size: $10
+
+Num player wins: 106,431
+Num dealer wins: 651,727
+Num pushes: 241,842
+Win %: 10.64%
+Lose %: 65.17%
+Push %: 24.18%
+Avg return per hand: $-3.82
+
+{
+    "High card": "27.77%",
+    "Pair": "29.29%",
+    "Two pair": "3.84%",
+    "Trips": "1.56%",
+    "Straight": "0.47%",
+    "Flush": "0.78%",
+    "Full House": "0.12%",
+    "Quads": "0.01%",
+    "Straight Flush": "0.01%",
+    "Royal Flush": "0.00%"
+}
