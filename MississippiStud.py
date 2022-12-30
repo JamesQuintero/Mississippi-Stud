@@ -11,11 +11,15 @@ import time
 import sys
 import random
 
+from HandStrength import HandStrength
+
 
 class MississippiStud:
 
-    #buy-in for $100
-    bankroll = 100
+    hand_strength = None
+
+    #Starting buy-in when sitting down at the table
+    starting_bankroll = 1000
     #min-bet is $15
     bet_amount = 10
     #[0] = Ante bet, [1] = 3rd street bet, [2] = 4th street bet, [3] = 5th street bet
@@ -63,6 +67,8 @@ class MississippiStud:
 
 
     def __init__(self):
+        self.hand_strength = HandStrength()
+
         self.reset()
         self.board = [""]*3
         self.player_hand = [""]*2
@@ -71,7 +77,7 @@ class MississippiStud:
 
     def reset(self):
         # self.bankroll = 100
-        self.bankroll = 1000000
+        self.bankroll = self.starting_bankroll
 
 
     def run(self):
@@ -86,120 +92,118 @@ class MississippiStud:
 
         #play
         if(choice==1):
-            # play()
             print("Coming soon")
-
-
 
         #simulate
         if(choice==2):
+            num_runs = int(input("Num runs: "))
+
             player_hands = [
-            ["14s", "14c"],
-            # ["14s", "13c"],
-            # ["14s", "12c"],
-            # ["14s", "11c"],
-            # ["14s", "10c"],
-            # ["14s", "9c"],
-            # ["14s", "8c"],
-            # ["14s", "7c"],
-            # ["14s", "6c"],
-            # ["14s", "5c"],
-            # ["14s", "4c"],
-            # ["14s", "3c"],
-            # ["14s", "2c"],
+                ["14s", "14c"],
+                # ["14s", "13c"],
+                # ["14s", "12c"],
+                # ["14s", "11c"],
+                # ["14s", "10c"],
+                # ["14s", "9c"],
+                # ["14s", "8c"],
+                # ["14s", "7c"],
+                # ["14s", "6c"],
+                # ["14s", "5c"],
+                # ["14s", "4c"],
+                # ["14s", "3c"],
+                # ["14s", "2c"],
 
-            # ["13s", "13c"],
-            # ["13s", "12c"],
-            # ["13s", "11c"],
-            # ["13s", "10c"],
-            # ["13s", "9c"],
-            # ["13s", "8c"],
-            # ["13s", "7c"],
-            # ["13s", "6c"],
-            # ["13s", "5c"],
-            # ["13s", "4c"],
-            # ["13s", "3c"],
-            # ["13s", "2c"],
+                # ["13s", "13c"],
+                # ["13s", "12c"],
+                # ["13s", "11c"],
+                # ["13s", "10c"],
+                # ["13s", "9c"],
+                # ["13s", "8c"],
+                # ["13s", "7c"],
+                # ["13s", "6c"],
+                # ["13s", "5c"],
+                # ["13s", "4c"],
+                # ["13s", "3c"],
+                # ["13s", "2c"],
 
-            # ["12s", "12c"],
-            # ["12s", "11c"],
-            # ["12s", "10c"],
-            # ["12s", "9c"],
-            # ["12s", "8c"],
-            # ["12s", "7c"],
-            # ["12s", "6c"],
-            # ["12s", "5c"],
-            # ["12s", "4c"],
-            # ["12s", "3c"],
-            # ["12s", "2c"],
+                # ["12s", "12c"],
+                # ["12s", "11c"],
+                # ["12s", "10c"],
+                # ["12s", "9c"],
+                # ["12s", "8c"],
+                # ["12s", "7c"],
+                # ["12s", "6c"],
+                # ["12s", "5c"],
+                # ["12s", "4c"],
+                # ["12s", "3c"],
+                # ["12s", "2c"],
 
-            # ["11s", "11c"],
-            # ["11s", "10c"],
-            # ["11s", "9c"],
-            # ["11s", "8c"],
-            # ["11s", "7c"],
-            # ["11s", "6c"],
-            # ["11s", "5c"],
-            # ["11s", "4c"],
-            # ["11s", "3c"],
-            # ["11s", "2c"],
+                # ["11s", "11c"],
+                # ["11s", "10c"],
+                # ["11s", "9c"],
+                # ["11s", "8c"],
+                # ["11s", "7c"],
+                # ["11s", "6c"],
+                # ["11s", "5c"],
+                # ["11s", "4c"],
+                # ["11s", "3c"],
+                # ["11s", "2c"],
 
-            # ["10s", "10c"],
-            # ["10s", "9c"],
-            # ["10s", "8c"],
-            # ["10s", "7c"],
-            # ["10s", "6c"],
-            # ["10s", "5c"],
-            # ["10s", "4c"],
-            # ["10s", "3c"],
-            # ["10s", "2c"],
+                # ["10s", "10c"],
+                # ["10s", "9c"],
+                # ["10s", "8c"],
+                # ["10s", "7c"],
+                # ["10s", "6c"],
+                # ["10s", "5c"],
+                # ["10s", "4c"],
+                # ["10s", "3c"],
+                # ["10s", "2c"],
 
-            # ["9s", "9c"],
-            # ["9s", "8c"],
-            # ["9s", "7c"],
-            # ["9s", "6c"],
-            # ["9s", "5c"],
-            # ["9s", "4c"],
-            # ["9s", "3c"],
-            # ["9s", "2c"],
+                # ["9s", "9c"],
+                # ["9s", "8c"],
+                # ["9s", "7c"],
+                # ["9s", "6c"],
+                # ["9s", "5c"],
+                # ["9s", "4c"],
+                # ["9s", "3c"],
+                # ["9s", "2c"],
 
-            # ["8s", "8c"],
-            # ["8s", "7c"],
-            # ["8s", "6c"],
-            # ["8s", "5c"],
-            # ["8s", "4c"],
-            # ["8s", "3c"],
-            # ["8s", "2c"],
+                # ["8s", "8c"],
+                # ["8s", "7c"],
+                # ["8s", "6c"],
+                # ["8s", "5c"],
+                # ["8s", "4c"],
+                # ["8s", "3c"],
+                # ["8s", "2c"],
 
-            # ["7s", "7c"],
-            # ["7s", "6c"],
-            # ["7s", "5c"],
-            # ["7s", "4c"],
-            # ["7s", "3c"],
-            # ["7s", "2c"],
+                # ["7s", "7c"],
+                # ["7s", "6c"],
+                # ["7s", "5c"],
+                # ["7s", "4c"],
+                # ["7s", "3c"],
+                # ["7s", "2c"],
 
-            # ["6s", "6c"],
-            # ["6s", "5c"],
-            # ["6s", "4c"],
-            # ["6s", "3c"],
-            # ["6s", "2c"],
+                # ["6s", "6c"],
+                # ["6s", "5c"],
+                # ["6s", "4c"],
+                # ["6s", "3c"],
+                # ["6s", "2c"],
 
-            # ["5s", "5c"],
-            # ["5s", "4c"],
-            # ["5s", "3c"],
-            # ["5s", "2c"],
+                # ["5s", "5c"],
+                # ["5s", "4c"],
+                # ["5s", "3c"],
+                # ["5s", "2c"],
 
-            # ["4s", "4c"],
-            # ["4s", "3c"],
-            # ["4s", "2c"],
+                # ["4s", "4c"],
+                # ["4s", "3c"],
+                # ["4s", "2c"],
 
-            # ["3s", "3c"],
-            # ["3s", "2c"]
+                # ["3s", "3c"],
+                # ["3s", "2c"]
             ]
 
             for x in range(0, len(player_hands)):
-                self.simulate(player_hands[x])
-            # self.simulate([])
+                self.simulate(num_runs, player_hands[x])
 
         #print best strategy
         if(choice==3):
@@ -209,10 +213,10 @@ class MississippiStud:
     """
     simulates one game given the starting player_hand
     """
-    def simulate(self, player_hand=[]):
+    def simulate(self, num_runs = 1000000, player_hand=[]):
 
         if len(player_hand)!=0:
-            print("Player hand: "+str(player_hand))
+            print("Starting player hand: "+str(self.convert_cards(player_hand)))
 
 
         self.reset()
@@ -220,9 +224,6 @@ class MississippiStud:
         num_player_wins = 0
         num_dealer_wins = 0
         num_pushes = 0
-
-        # num_runs=1
-        num_runs = 1000000
 
         # while(True):
         for x in range(0, num_runs):
@@ -270,18 +271,18 @@ class MississippiStud:
 
 
             # dealer_hand_strength = self.determine_hand_strength(self.board, self.dealer_hand)
-            player_hand_strength = self.determine_hand_strength(self.board, self.player_hand)
+            player_hand_strength = self.hand_strength.determine_hand_strength(self.board, self.player_hand)
 
             #player wins with pair of jacks or better
             if player_hand_strength[0] >= 2 or (player_hand_strength[0] == 1 and player_hand_strength[1][0]>=11):
                 num_player_wins += 1
-
                 self.bankroll += sum(self.bets)*self.payout[player_hand_strength[0]]
+
             #pushes with pair of 6s to pair of 10s
             elif player_hand_strength[0] == 1 and player_hand_strength[1][0]>=6:
                 num_pushes += 1
-
                 self.bankroll += sum(self.bets)
+
             #player lost
             else:
                 num_dealer_wins += 1
@@ -295,7 +296,7 @@ class MississippiStud:
 
 
         # print("Player hand: "+str(player_hand))
-        self.print_current_state()
+        self.print_bankroll_state()
 
 
         print("Num player wins: "+str(num_player_wins))
@@ -309,43 +310,15 @@ class MississippiStud:
         print()
         print()
 
-    """
-    returns 1 if hand1 won, 0 if hand2 won, and -1 if split
-    """
-    def winner(self, hand1_strength, hand2_strength):
-
-        if hand1_strength[0]>hand2_strength[0]:
-            return 1
-        elif hand1_strength[0]<hand2_strength[0]:
-            return 0
-        #if same hand
-        else:
-            #if returned hand data doesn't include lists
-            if hand1_strength[0]==8 or hand1_strength[0]==5 or hand1_strength[0]==4 or hand1_strength[0]==9:
-                if hand1_strength[1]>hand2_strength[1]:
-                    return 1
-                elif hand1_strength[1]<hand2_strength[1]:
-                    return 0
-                else:
-                    return -1
-            else:
-                for x in range(0, len(hand1_strength[1])):
-                    if hand1_strength[1][x]>hand2_strength[1][x]:
-                        return 1
-                    elif hand1_strength[1][x]<hand2_strength[1][x]:
-                        return 0
-                return -1
 
 
-
-    # #tests self.determine_hand_strength()
     # def test(self):
 
     # 	#tests flush
     # 	board=["12c", "11c", "10c", "5s", "3c"]
     # 	hand = ["14c", "13c"]
 
-    # 	hand_strength = self.determine_hand_strength(board, hand)
+    # 	hand_strength = self.hand_strength.determine_hand_strength(board, hand)
     # 	print(hand_strength)
 
 
@@ -387,7 +360,9 @@ class MississippiStud:
         # self.bet(3, self.bets[2])
         
 
-
+    """
+    Basic strategy way to play 3rd street (1st community card)
+    """
     def bet_3rd_street(self, sorted_player_hand):
         ###
         #bets 3rd street
@@ -402,7 +377,7 @@ class MississippiStud:
 
         points = self.get_num_points(street="ante")
 
-        hand_strength = self.determine_hand_strength(board=[], hand=self.player_hand)
+        hand_strength = self.hand_strength.determine_hand_strength(board=[], hand=self.player_hand)
 
         #Raise 3x with any pair
         # if hand_strength[0]==1:
@@ -424,7 +399,9 @@ class MississippiStud:
 
         return True
     
-
+    """
+    Basic strategy way to play 4th street (2nd community card)
+    """
     def bet_4th_street(self):
         ###
         # bets 4th card (4th street)
@@ -445,7 +422,7 @@ class MississippiStud:
 
         points = self.get_num_points(street="3rd")
 
-        hand_strength = self.determine_hand_strength(board=[self.board[0]], hand=self.player_hand)
+        hand_strength = self.hand_strength.determine_hand_strength(board=[self.board[0]], hand=self.player_hand)
 
         #Raise 3x with any made hand (mid pair or higher)
         if hand_strength[0] >= 2 or (hand_strength[0]==1 and hand_strength[1][0]>=6):
@@ -468,6 +445,9 @@ class MississippiStud:
 
         return True
 
+    """
+    Basic strategy way to play 5th street (3rd community card)
+    """
     def bet_5th_street(self):
         ###
         # bets 5th card (5th street)
@@ -484,7 +464,7 @@ class MississippiStud:
 
         points = self.get_num_points(street="4th")
 
-        hand_strength = self.determine_hand_strength(board=self.board[0:2], hand=self.player_hand)
+        hand_strength = self.hand_strength.determine_hand_strength(board=self.board[0:2], hand=self.player_hand)
 
         
         #Raise 3x with any made hand (mid pair or higher)
@@ -617,31 +597,41 @@ class MississippiStud:
     prints current state of the board and bets
     """
     def print_current_state(self):
-        print()
-
-        print("Bankroll: $"+str(self.bankroll))
-        print("Bet size: $"+str(self.bet_amount))
-        print()
+        self.print_bankroll_state()
 
         print("Ante bet: $"+str(self.bets[0]))
         print("3rd st bet: $"+str(self.bets[1]))
         print("4th st bet: $"+str(self.bets[2]))
         print("5th st bet: $"+str(self.bets[3]))
-        print()
 
-        # print("Dealer hand: "+self.convert_card(self.dealer_hand[0])+","+self.convert_card(self.dealer_hand[1]))
-        print("Board: "+self.convert_card(self.board[0])+","+self.convert_card(self.board[1])+","+self.convert_card(self.board[2]))
-        print("player hand: "+self.convert_card(self.player_hand[0])+","+self.convert_card(self.player_hand[1]))
-        print()
+        self.print_board_state()
 
         # dealer_hand_strength = self.determine_hand_strength(self.board, self.dealer_hand)
         # print("Dealer hand strength: "+str(dealer_hand_strength))
 
-        player_hand_strength = self.determine_hand_strength(self.board, self.player_hand)
-        print("Player hand strength: {}".format(self.convert_hand_strength(player_hand_strength)))
+        player_hand_strength = self.hand_strength.determine_hand_strength(self.board, self.player_hand)
+        print("Player hand strength: {}".format(self.hand_strength.convert_hand_strength(player_hand_strength)))
 
         print()
 
+
+    """
+    Prints the state of the bankroll, like amount, bet size.
+    """
+    def print_bankroll_state(self):
+        print()
+        print("Starting bankroll: ${:,}".format(self.starting_bankroll))
+        print("Bankroll: ${:,}".format(self.bankroll))
+        print("Bet size: ${:,}".format(self.bet_amount))
+        print()
+        
+
+    def print_board_state(self):
+        print()
+        # print("Dealer hand: "+self.convert_card(self.dealer_hand[0])+","+self.convert_card(self.dealer_hand[1]))
+        print("Board: {},{},{}".format(self.convert_card(self.board[0]), self.convert_card(self.board[1]), self.convert_card(self.board[2])))
+        print("player hand: {},{}".format(self.convert_card(self.player_hand[0]), self.convert_card(self.player_hand[1])))
+        print()
 
 
     """
@@ -663,272 +653,77 @@ class MississippiStud:
 
         return to_return[hand_strength[0]]
 
-    def determine_hand_strength(self, board, hand):
-        #0 = high card
-        #1 = pair
-        #2 = 2-pair
-        #3 = trips
-        #4 = straight
-        #5 = flush
-        #6 = full house
-        #7 = quads
-        #8 = straight flush
-        #9 = royal flush
-
-        #will return [#, [list of information like how high straight or flush is]]
-
-        #starts at 0 spot (0 and 1 aren't used), and ends at Ace
-        cards=[0]*15
-        #spade, club, heart, diamond
-        #list of cards that had that suit
-        suits={"s": [], "c": [], "h": [], "d": []}
-
-        #adds hand data to lists
-        value1=int(hand[0][0:len(hand[0])-1])
-        suit1=hand[0][-1:]
-        value2=int(hand[1][0:len(hand[1])-1])
-        suit2=hand[1][-1:]
-        cards[value1]+=1
-        suits[suit1].append(value1)
-        cards[value2]+=1
-        suits[suit2].append(value2)
-
-
-        #adds board data to lists
-        for x in range(0, len(board)):
-            value=int(board[x][0:len(board[x])-1])
-            suit=board[x][-1:]
-            cards[value]+=1
-            suits[suit].append(value)
-
-        # print(hand)
-        # print(board)
-        # print(cards)
-        # print(suits)
-
-        has_straight=self.has_straight(cards)
-
-
-        #if straight
-        if has_straight[0]==True:
-            str_height=has_straight[1]
-
-            #if 5 of same suits in play and they're all in the straight
-            for key in suits.keys():
-                if len(suits[key])>=5 and str_height-4 in suits[key] and str_height-3 in suits[key] and str_height-2 in suits[key] and str_height-1 in suits[key] and str_height in suits[key]:
-                    
-                    #royal flush
-                    if str_height==14:
-                        return [9, 0]
-                    #straight flush
-                    return [8, str_height]
-
-        #if quads
-        if 4 in cards:
-            quads=cards.index(4)
-
-            #doesn't include quads in getting kicker
-            cards[quads]=0
-
-            #gets highest card in play
-            kicker=self.get_kicker_indices(cards, 1)
-            # kicker=kicker[0]
-
-            extra = [quads]
-            for x in range(0, min(1, len(kicker))):
-                extra.append(kicker)
-
-            return [7, extra]
-
-        #if full house
-        if (3 in cards and 2 in cards) or cards.count(3)==2:
-
-            #gets highest 3 in play
-            highest3=0
-            for x in range(0, len(cards)):
-                if cards[x]==3:
-                    highest3=x
-
-            #doesn't include set of boat in getting other part
-            cards[highest3]=0
-
-            #gets highest 2 in play
-            highest2=0
-            for x in range(0, len(cards)):
-                if cards[x]>=2:
-                    highest2=x
-
-            #Aces of Kings full house will return [6, [14, 13]]
-            return [6, [highest3, highest2]]
-
-        #if flush
-        for key in suits.keys():
-            if len(suits[key])>=5:
-
-                #returns highest player's flush if they have 2 of the suits
-                if suit1==key and suit2==key:
-                    flush=max([value1, value2])
-                #return player's flush if they have 1 of the suits or 0 if board plays
-                if suit1==key:
-                    flush=value1
-                elif suit2==key:
-                    flush=value2
-                else:
-                    flush=0
-
-                #returns highest card in flush
-                return [5, flush]
-
-        #if straight
-        if has_straight[0]==True:
-            return [4, has_straight[1]]
-
-        #if trips
-        if 3 in cards:
-            trips=cards.index(3)
-
-            #doesn't include trips in getting kicker
-            cards[trips]=0
-
-            #returns highest 2 cards not part of trips
-            kickers=self.get_kicker_indices(cards, 2)
-            extra = [trips]
-            for x in range(0, min(2, len(kickers))):
-                extra.append(kickers[x])
-
-            return [3, extra]
-
-        #if 2 pair
-        if cards.count(2)>=2:
-            #gets highest two pair
-            highest1=0
-            highest2=0
-            for x in range(0, len(cards)):
-                if cards[x]==2:
-                    highest2=highest1
-                    highest1=x
-
-            #doesn't include 2 pair in getting kicker
-            cards[highest1]=0
-            cards[highest2]=0
-
-            #gets high card
-            kicker = self.get_kicker_indices(cards, 1)
-            # kicker = kicker[0]
-            extra = [highest1, highest2]
-
-            for x in range(0, min(1, len(kicker))):
-                extra.append(kicker[x])
-
-            return [2, extra]
-
-        #if regular pair
-        if cards.count(2)==1:
-            pair=cards.index(2)
-
-            #doesn't include pair in getting kickers
-            cards[pair]=0
-
-            #get 3 other highest cards
-            kickers=self.get_kicker_indices(cards, 3)
-
-            values=[pair]
-            for x in range(0, len(kickers)):
-                if x<3:
-                    values.append(kickers[x])
-            return [1, values]
-
-        #if high card
-        kickers=self.get_kicker_indices(cards, 5)
-        return [0, kickers]
-
-
-
-
-    #gets indicies for num_kickers
-    def get_kicker_indices(self, temp_cards, num_kickers):
-        temp=[]
-        for x in range(len(temp_cards)-1, -1, -1):
-            if temp_cards[x]!=0 and len(temp)<num_kickers:
-                temp.append(x)
-        return temp
-
-
-    #returns [True, straight_height] if has straight
-    def has_straight(self, cards):
-
-        for x in range(2, len(cards)-4):
-            if cards[x]>=1 and cards[x+1]>=1 and cards[x+2]>=1 and cards[x+3]>=1 and cards[x+4]>=1:
-                return [True, x+4]
-
-        #wheel straight
-        if cards[2]>=1 and cards[3]>=1 and cards[4]>=1 and cards[5]>=1 and cards[14]>=1:
-            return [True, 5]
-
-        return [False, 0]
-
-
+    """
+    Creates a random deck of 52 cards
+    """
     def initialize_deck(self):
 
         #s = Spade
         #c = Club
         #h = Heart
         #d = Diamond
-        deck=["2s","2c","2h","2d", 
-        "3s","3c","3h","3d", 
-        "4s","4c","4h","4d", 
-        "5s","5c","5h","5d",
-        "6s","6c","6h","6d",  
-        "7s","7c","7h","7d",  
-        "8s","8c","8h","8d",  
-        "9s","9c","9h","9d",  
-        "10s","10c","10h","10d",  
-        "11s","11c","11h","11d",  
-        "12s","12c","12h","12d",  
-        "13s","13c","13h","13d",  
-        "14s","14c","14h","14d"]
+        deck = [
+            "2s","2c","2h","2d", 
+            "3s","3c","3h","3d", 
+            "4s","4c","4h","4d", 
+            "5s","5c","5h","5d",
+            "6s","6c","6h","6d",  
+            "7s","7c","7h","7d",  
+            "8s","8c","8h","8d",  
+            "9s","9c","9h","9d",  
+            "10s","10c","10h","10d",  
+            "11s","11c","11h","11d",  
+            "12s","12c","12h","12d",  
+            "13s","13c","13h","13d",  
+            "14s","14c","14h","14d"
+        ]
+        random.shuffle(deck)
 
-        #creates randomized list of cards
-        random_deck=[]
-        while len(deck)!=0:
+        self.deck = deck
 
-            #gets random index
-            random_index=random.randint(0, len(deck)-1)
-            random_deck.append(deck[random_index])
-            deck.pop(random_index)
 
-        self.deck = random_deck
+    def convert_cards(self, cards):
+        to_return = []
+        for x in range(0, len(cards)):
+            to_return.append(self.convert_card(cards[x]))
+        return to_return
 
-    #turns 12s into Qs
+    """
+    Turns 12s into Qs
+    """
     def convert_card(self, card):
 
-        before=["2s","2c","2h","2d", 
-        "3s","3c","3h","3d", 
-        "4s","4c","4h","4d", 
-        "5s","5c","5h","5d",
-        "6s","6c","6h","6d",  
-        "7s","7c","7h","7d",  
-        "8s","8c","8h","8d",  
-        "9s","9c","9h","9d",  
-        "10s","10c","10h","10d",  
-        "11s","11c","11h","11d",  
-        "12s","12c","12h","12d",  
-        "13s","13c","13h","13d",  
-        "14s","14c","14h","14d"]
+        before=[
+            "2s","2c","2h","2d", 
+            "3s","3c","3h","3d", 
+            "4s","4c","4h","4d", 
+            "5s","5c","5h","5d",
+            "6s","6c","6h","6d",  
+            "7s","7c","7h","7d",  
+            "8s","8c","8h","8d",  
+            "9s","9c","9h","9d",  
+            "10s","10c","10h","10d",  
+            "11s","11c","11h","11d",  
+            "12s","12c","12h","12d",  
+            "13s","13c","13h","13d",  
+            "14s","14c","14h","14d"
+        ]
 
-        after=["2s","2c","2h","2d", 
-        "3s","3c","3h","3d", 
-        "4s","4c","4h","4d", 
-        "5s","5c","5h","5d",
-        "6s","6c","6h","6d",  
-        "7s","7c","7h","7d",  
-        "8s","8c","8h","8d",  
-        "9s","9c","9h","9d",  
-        "10s","10c","10h","10d",  
-        "Js","Jc","Jh","Jd",  
-        "Qs","Qc","Qh","Qd",  
-        "Ks","Kc","Kh","Kd",  
-        "As","Ac","Ah","Ad"]
+        after=[
+            "2s","2c","2h","2d", 
+            "3s","3c","3h","3d", 
+            "4s","4c","4h","4d", 
+            "5s","5c","5h","5d",
+            "6s","6c","6h","6d",  
+            "7s","7c","7h","7d",  
+            "8s","8c","8h","8d",  
+            "9s","9c","9h","9d",  
+            "10s","10c","10h","10d",  
+            "Js","Jc","Jh","Jd",  
+            "Qs","Qc","Qh","Qd",  
+            "Ks","Kc","Kh","Kd",  
+            "As","Ac","Ah","Ad"
+        ]
 
         try:
             index = before.index(card)
