@@ -55,7 +55,11 @@ class HandStrength:
             9: "Royal Flush"
         }
 
-        return to_return[hand_strength[0]]
+        #If provided in format of HandStrength
+        if isinstance(hand_strength, list):
+            return to_return[hand_strength[0]]
+        else:
+            return to_return[hand_strength]
 
     """
     Returns the hand strength along with kickers
