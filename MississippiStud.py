@@ -77,6 +77,9 @@ class MississippiStud:
 
         self.verbose = False
 
+    """
+    Sets up global variables
+    """
     def reset(self):
         self.bankroll = self.starting_bankroll
 
@@ -94,6 +97,9 @@ class MississippiStud:
         }
 
 
+    """
+    Provides menu to the user
+    """
     def run(self):
 
         print("Menu: ")
@@ -113,12 +119,16 @@ class MississippiStud:
             # self.simulate()
             # self.simulate_all_cards()
             # self.simulate_important_cards()
-            self.simulate_flushes()
+            # self.simulate_flushes()
+            self.simulate_high_cards()
 
         #print best strategy
         if(choice==3):
             print("Nothing here, yet")
 
+    """
+    CSV header of the results, column titles
+    """
     def get_header(self):
         return [
             "Player's hand",
@@ -141,6 +151,9 @@ class MississippiStud:
         ]
 
 
+    """
+    Simulates the player having certain types of hands, like pairs, or one high card and one low card, etc. The stats should be the same between Kx5x and Jx2x since they are both one high and one low card. 
+    """
     def simulate_important_cards(self):
         player_hands = [
             ["13s", "13c"], #Winning pair
@@ -172,6 +185,43 @@ class MississippiStud:
 
 
     """
+    Simulates change in odds if you see whether other players do or do not have the same high card.
+    """
+    def simulate_high_cards(self):
+        player_hands = [
+            ["13c", "11d"], #One high card
+            ["13c", "11d"], #One high card
+            ["13c", "11d"], #One high card
+            ["13c", "11d"], #One high card
+            ["13c", "11d"], #One high card
+            ["13c", "11d"], #One high card
+            ["13c", "11d"], #One high card
+            ["13c", "11d"], #One high card
+            ["13c", "11d"], #One high card
+        ]
+
+        cards_to_remove = [
+            [],
+            ["13x"], #See 1 card is same
+            ["13x", "13x"], #See 2 cards are the same
+            ["13x", "13x", "13x"], #See 3 other cards are the same
+            ["2x"], #See 1 card not same type
+            ["2x", "14x", "3x"], #See 3 cards not same type
+            ["2x", "14x", "3x", "12x", "4x", "10x"], #See 6 cards not same type
+            ["2x", "14x", "3x", "12x", "4x", "10x", "5x", "9x"], #See 8 cards not same type
+            ["2x", "14x", "3x", "12x", "4x", "10x", "5x", "9x", "6x", "8x"], #See 10 cards not same type
+        ]
+
+        num_runs = int(input("Num runs: "))
+        play_optimally = input("Play optimally? (y/n): ").lower() == "y"
+
+
+        play_style = "optimal_play" if play_optimally else "play_to_end"
+        save_path = "./Results/simulate_{}_runs_high_cards_{}.csv".format(num_runs, play_style)
+        self.simulate(num_runs, player_hands, cards_to_remove, play_optimally=play_optimally, save_path=save_path)
+
+
+    """
     No matter the hand, each suited hand has the same chance of getting a flush, so simulate that chance depending on seeing other player's cards.
     """
     def simulate_flushes(self):
@@ -197,7 +247,7 @@ class MississippiStud:
             ["Xd", "Xs", "Xh", "Xd", "Xs", "Xh"], #See 6 cards with same suit
             ["Xd", "Xs", "Xh", "Xd", "Xs", "Xh", "Xd", "Xs"], #See 8 cards with same suit
             ["Xd", "Xs", "Xh", "Xd", "Xs", "Xh", "Xd", "Xs", "Xh", "Xd"], #See 10 cards with same suit
-        ] * len(player_hands)
+        ]
 
         num_runs = int(input("Num runs: "))
         play_optimally = input("Play optimally? (y/n): ").lower() == "y"
@@ -208,6 +258,9 @@ class MississippiStud:
         self.simulate(num_runs, player_hands, cards_to_remove, play_optimally=play_optimally, save_path=save_path)
 
 
+    """
+    Simulates the player having all combinations of hands. 
+    """
     def simulate_all_cards(self):
         player_hands = [
             ["14s", "14c"],
@@ -416,6 +469,9 @@ class MississippiStud:
         self.simulate(num_runs, player_hands, cards_to_remove)
 
 
+    """
+    Runs through all provided player hands to simulate many games for each hand.
+    """
     def simulate(self, num_runs = None, player_hands=[], cards_to_remove=[], play_optimally=None, save_path=None):
         if num_runs == None:
             num_runs = int(input("Num runs: "))
@@ -451,7 +507,7 @@ class MississippiStud:
 
 
     """
-    simulates one game given the starting player_hand
+    Simulates one game many times given the starting player_hand
     """
     def simulate_many_runs(self, num_runs = 1000000, play_optimally=True, player_hand=[], cards_to_remove=[]):
 
@@ -468,7 +524,6 @@ class MississippiStud:
         num_pushes = 0
         total_profit = 0
 
-        # while(True):
         for x in range(0, num_runs):
 
             starting_bankroll = self.bankroll
@@ -501,8 +556,6 @@ class MississippiStud:
                 print("Hand #"+str(x))
 
 
-
-        # print("Player hand: "+str(player_hand))
         self.print_bankroll_state()
 
         print("Num player wins: {:,}".format(num_player_wins))
@@ -520,7 +573,7 @@ class MississippiStud:
 
 
     """
-    Returns 1 if player wins, -1 if dealer wins, and 0 if push
+    Simulates a single game. Returns 1 if player wins, -1 if dealer wins, and 0 if push
     """
     def simulate_single(self, play_optimally=True, player_hand=None, cards_to_remove=[]):
 
@@ -540,19 +593,22 @@ class MississippiStud:
         self.deck.pop(self.deck.index(self.player_hand[0]))
         self.deck.pop(self.deck.index(self.player_hand[1]))
 
-        # print("Cards to remove: {}".format(cards_to_remove))
-        # print("Len deck before: {}".format(len(self.deck)))
         #Remove cards that you would see in other player's hands
         for card in cards_to_remove:
             try:
                 #If type of card is wild, choose random card of that suit
                 if "X" in card:
                     card = self.get_cards_same_suit(num_cards=1, suit=self.get_suit(card))[0]
+                #If suit is wild, choose random card of that type
+                elif "x" in card:
+                    card = self.get_cards_same_type(num_cards=1, type=self.get_type(card))[0]
 
                 self.deck.pop(self.deck.index(card))
             except Exception as error:
+                print("Error: {}".format(error))
                 pass
 
+        #Shuffles since we removed cards from the bottom of the deck.
         random.shuffle(self.deck)
 
 
@@ -563,7 +619,8 @@ class MississippiStud:
             #player bets optimally, according to wizard-of-odds
             self.play_optimally()
         else:
-            self.play_3rd_str_then_optimally()
+            # self.play_3rd_str_then_optimally()
+            self.play_until_end()
 
 
 
@@ -593,21 +650,8 @@ class MississippiStud:
                 self.hand_strength_distribution[player_hand_strength[0]] += 1
             return -1
 
-
-
-    # def get_cards_same_suit(self, num_cards, suit):
-    #     num_tries = 0
-    #     cards = []
-    #     while len(cards) < num_cards and num_tries <= 500:
-    #         random_index = random.randint(0, len(self.deck)-1)
-
-    #         if self.get_suit(self.deck[random_index]) == suit:
-    #             cards.append(self.deck.pop(random_index))
-
-    #     return cards
-
     """
-    
+    Given the suit of card (ex: h, s), randomly find the specified number of them
     """
     def get_cards_same_suit(self, num_cards, suit):
         cards = []
@@ -620,30 +664,19 @@ class MississippiStud:
 
         return cards
 
-    # """
-    # Given the type of card (ex: 13x), randomly find the specified number of them
-    # """
-    # def get_cards_same_value(self, num_cards, type):
-    #     cards = []
-    #     for x in range(0, len(self.deck)):
-    #         if self.get_suit(self.deck[x]) == suit:
-    #             cards.append(self.deck[x])
+    """
+    Given the type of card (ex: 13x), randomly find the specified number of them
+    """
+    def get_cards_same_type(self, num_cards, type):
+        cards = []
+        for x in range(0, len(self.deck)):
+            if self.get_type(self.deck[x]) == type:
+                cards.append(self.deck[x])
 
-    #         if len(cards) >= num_cards:
-    #             break
+            if len(cards) >= num_cards:
+                break
 
-    #     return cards
-
-
-    # def test(self):
-
-    # 	#tests flush
-    # 	board=["12c", "11c", "10c", "5s", "3c"]
-    # 	hand = ["14c", "13c"]
-
-    # 	hand_strength = self.hand_strength.determine_hand_strength(board, hand)
-    # 	print(hand_strength)
-
+        return cards
 
 
     """
@@ -684,11 +717,7 @@ class MississippiStud:
             print("Player's hand: "+str(self.player_hand))
             print("Board: "+str(self.board))
 
-        sorted_player_hand = sorted(self.player_hand)
-
-        # success = self.bet_3rd_street(sorted_player_hand)
-        # if not success:
-        #     return 
+        #Bets 3rd street no matter what
         self.bet(1, self.bet_amount)
 
         success = self.bet_4th_street()
@@ -881,17 +910,10 @@ class MississippiStud:
         elif street == "5th":
             cards = self.board + self.player_hand
 
-
-        # print("Cards: "+str(cards))
-
-
         #gets points of all cards
         points = 0
         for card in cards:
             value = int(card[:-1])
-            suit = card[1]
-
-            # print("Value: "+str(value))
 
             #J-A are 2 points
             if value >= 11:
@@ -903,14 +925,7 @@ class MississippiStud:
             else:
                 points += 0
 
-
-
-
-        # print("Points: "+str(points))
-        # input()
         return points
-
-
 
     """
     places player's initial bets
@@ -933,21 +948,15 @@ class MississippiStud:
         self.bets[street] = amount
         self.bankroll -= amount
 
-
-
     """
     deals community cards and other player's cards
+
+    board only has 3 cards in mississippi stud
     """
     def deal(self):
-
-        #board only has 3 cards in mississippi stud
         self.board[0] = self.deck.pop()
         self.board[1] = self.deck.pop()
         self.board[2] = self.deck.pop()
-        # self.board[3] = self.deck.pop()
-        # self.board[4] = self.deck.pop()
-
-
 
 
     """
@@ -962,9 +971,6 @@ class MississippiStud:
         print("5th st bet: $"+str(self.bets[3]))
 
         self.print_board_state()
-
-        # dealer_hand_strength = self.determine_hand_strength(self.board, self.dealer_hand)
-        # print("Dealer hand strength: "+str(dealer_hand_strength))
 
         player_hand_strength = self.hand_strength.determine_hand_strength(self.board, self.player_hand)
         print("Player hand strength: {}".format(self.hand_strength.convert_hand_strength(player_hand_strength)))
@@ -983,14 +989,19 @@ class MississippiStud:
         print()
         
 
+    """
+    Prints the community cards and player hand
+    """
     def print_board_state(self):
         print()
-        # print("Dealer hand: "+self.convert_card(self.dealer_hand[0])+","+self.convert_card(self.dealer_hand[1]))
         print("Board: {},{},{}".format(self.convert_card(self.board[0]), self.convert_card(self.board[1]), self.convert_card(self.board[2])))
         print("player hand: {},{}".format(self.convert_card(self.player_hand[0]), self.convert_card(self.player_hand[1])))
         print()
         
 
+    """
+    Print distribution of each type of made hand, like % rates of pairs, two pairs, etc. 
+    """
     def print_hand_strength_distribution(self, num_runs=None):
         #If don't specify number of runs, just print raw values
         if not num_runs:
@@ -1002,8 +1013,6 @@ class MississippiStud:
                 new_hand_distribution[self.convert_hand_strength(key)] = "{:.2f}%".format(self.hand_strength_distribution[key]/num_runs*100)
             print(json.dumps(new_hand_distribution, indent=4, default=str))
             
-
-
     """
     Given the hand strength, convert to english version
     """
@@ -1113,6 +1122,12 @@ class MississippiStud:
     """
     def get_suit(self, card):
         return card[-1:]
+
+    """
+    Gets the type of card, like whether it's a 7, 11, or 2.
+    """
+    def get_type(self, card):
+        return card[:-1]
 
 
     """

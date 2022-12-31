@@ -38,5 +38,16 @@ Given any pair, there's a 72% chance of getting a pair, 16% chance of two pair, 
 
 
 ## Winning cards taken
-* How do your odds change if you see other players do or do not have your high card?
-  * 1 
+How do your odds change if you see other players do or do not have your high card? 
+
+| # cards of same type | Win % | Avg Profit $ | Pair % Chance | Two pair % chance | Trips % chance |
+| ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |
+| No cards | 35% | $5.02 | 35% | 4% | 1.5% |
+| 1 card | 31% | -$0.85 | 33% | 3.2% | 1.2% |
+| 2 cards | 27% | -$6.25 | 30% | 2.3% | 1% |
+| 3 cards | 22% | -$11.75 | 27% | 1.2% | 1.1% | 
+| 1 card not | 36% | $6.02 | 36% | 4.1% | 1.6% | 
+| 3 cards not | 37% | $7.65 | 37% | 4.4% | 1.7% | 
+| 6 cards not | 38% | $9.86 | 38% | 4.8% | 1.9% | 
+| 8 cards not | 40% | $11.93 | 39% | 5.0% | 2.0% | 
+| 10 cards not | 42% | $14.22 | 39% | 5.3% | 2.2% | 
