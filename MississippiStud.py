@@ -7,6 +7,8 @@
 #determines best strategy for playing Mississippi Stud
 
 import json
+import csv
+import os
 import copy
 import random
 
@@ -108,149 +110,350 @@ class MississippiStud:
 
         #simulate
         if(choice==2):
-            num_runs = int(input("Num runs: "))
-
-            player_hands = [
-                # ["14s", "14c"],
-                # ["14s", "13c"],
-                # ["14s", "12c"],
-                # ["14s", "11c"],
-                # ["14s", "10c"],
-                # ["14s", "9c"],
-                # ["14s", "8c"],
-                # ["14s", "7c"],
-                # ["14s", "6c"],
-                # ["14s", "5c"],
-                # ["14s", "4c"],
-                # ["14s", "3c"],
-                # ["14s", "2c"],
-
-                # ["13s", "13c"],
-                # ["13s", "12c"],
-                # ["13s", "11c"],
-                # ["13s", "10c"],
-                # ["13s", "9c"],
-                # ["13s", "8c"],
-                # ["13s", "7c"],
-                # ["13s", "6c"],
-                # ["13s", "5c"],
-                # ["13s", "4c"],
-                # ["13s", "3c"],
-                # ["13s", "2c"],
-
-                # ["12s", "12c"],
-                # ["12s", "11c"],
-                # ["12s", "10c"],
-                # ["12s", "9c"],
-                # ["12s", "8c"],
-                # ["12s", "7c"],
-                # ["12s", "6c"],
-                # ["12s", "5c"],
-                # ["12s", "4c"],
-                # ["12s", "3c"],
-                # ["12s", "2c"],
-
-                # ["11s", "11c"],
-                # ["11s", "10c"],
-                # ["11s", "9c"],
-                # ["11s", "8c"],
-                # ["11s", "7c"],
-                # ["11s", "6c"],
-                # ["11s", "5c"],
-                # ["11s", "4c"],
-                # ["11s", "3c"],
-                # ["11s", "2c"],
-
-                # ["10s", "10c"],
-                # ["10s", "9c"],
-                # ["10s", "8c"],
-                # ["10s", "7c"],
-                # ["10s", "6c"],
-                # ["10s", "5c"],
-                # ["10s", "4c"],
-                # ["10s", "3c"],
-                # ["10s", "2c"],
-
-                # ["9s", "9c"],
-                # ["9s", "8c"],
-                # ["9s", "7c"],
-                # ["9s", "6c"],
-                # ["9s", "5c"],
-                # ["9s", "4c"],
-                # ["9s", "3c"],
-                # ["9s", "2c"],
-
-                # ["8s", "8c"],
-                # ["8s", "7c"],
-                # ["8s", "6c"],
-                # ["8s", "5c"],
-                # ["8s", "4c"],
-                # ["8s", "3c"],
-                # ["8s", "2c"],
-
-                # ["7s", "7c"],
-                # ["7s", "6c"],
-                # ["7s", "5c"],
-                # ["7s", "4c"],
-                # ["7s", "3c"],
-                # ["7s", "2c"],
-
-                # ["6s", "6c"],
-                # ["6s", "5c"],
-                # ["6s", "4c"],
-                # ["6s", "3c"],
-                # ["6s", "2c"],
-
-                # ["5s", "5c"],
-                # ["5s", "4c"],
-                # ["5s", "3c"],
-                # ["5s", "2c"],
-
-                # ["4s", "4c"],
-                # ["4s", "3c"],
-                # ["4s", "2c"],
-
-                # ["3s", "3c"],
-                # ["3s", "2c"]
-            ]
-
-            player_hands = [
-                # ["14s", "10c"],
-                # ["14s", "10c"],
-                # ["14s", "10c"],
-                ["14s", "5c"],
-                ["14s", "5c"],
-                ["14s", "5c"],
-            ]
-
-            cards_to_remove = [
-                [],
-                # ["14h"],
-                # ["14h", "14c"],
-                ["5h"],
-                ["5h", "5s"],
-            ]
-
-            player_hands = [
-                ["7s", "6s"]
-            ]
-            cards_to_remove = [
-                # ["14c", "10c", "8c, 9h", "4s", "11d"]
-                []
-            ]
-
-            for x in range(0, len(player_hands)):
-                num_player_wins, num_dealer_wins, num_push, total_profit, ending_bankroll, hand_strengths = self.simulate(num_runs, play_optimally=True, player_hand=player_hands[x], cards_to_remove=cards_to_remove[x])
+            # self.simulate()
+            # self.simulate_all_cards()
+            # self.simulate_important_cards()
+            self.simulate_flushes()
 
         #print best strategy
         if(choice==3):
             print("Nothing here, yet")
 
+    def get_header(self):
+        return [
+            "Player's hand",
+            "Other player's cards",
+            "Win %",
+            "Lose %",
+            "Push %",
+            "Avg profit $",
+            "Ending bankroll $",
+            "High Card %",
+            "Pair %",
+            "Two Pair %",
+            "Trips %",
+            "Straight %",
+            "Flush %",
+            "Full House %",
+            "Quads %",
+            "Straight Flush %",
+            "Royal Flush %"
+        ]
+
+
+    def simulate_important_cards(self):
+        player_hands = [
+            ["13s", "13c"], #Winning pair
+            ["13s", "12c"], #Two winning cards
+            ["13c", "12c"], #Two winning cards suited
+            ["13s", "9c"], #Winning card and push card
+            ["13c", "9c"], #Winning card and push card suited
+            ["13s", "5c"], #Winning card and losing card
+            ["13c", "5c"], #Winning card and losing card suited
+
+            ["9s", "9c"], #Pushing pair
+            ["9s", "8c"], #Two pushing cards
+            ["9c", "8c"], #Two pushing cards suited
+            ["9s", "5c"], #Push card and losing card
+            ["9c", "5c"], #Push card and losing card suited
+
+            ["5s", "5c"], #Losing pair
+            ["5s", "4c"], #Two losing cards
+            ["5c", "4c"], #Two losing cards suited
+        ]
+
+        cards_to_remove = [
+            []
+        ] * len(player_hands)
+
+        num_runs = int(input("Num runs: "))
+
+        self.simulate(num_runs, player_hands, cards_to_remove)
+
+
+    """
+    No matter the hand, each suited hand has the same chance of getting a flush, so simulate that chance depending on seeing other player's cards.
+    """
+    def simulate_flushes(self):
+        player_hands = [
+            ["5c", "4c"], #Two losing cards suited
+            ["5c", "4c"], #Two losing cards suited
+            ["5c", "4c"], #Two losing cards suited
+            ["5c", "4c"], #Two losing cards suited
+            ["5c", "4c"], #Two losing cards suited
+            ["5c", "4c"], #Two losing cards suited
+            ["5c", "4c"], #Two losing cards suited
+            ["5c", "4c"], #Two losing cards suited
+            ["5c", "4c"], #Two losing cards suited
+        ]
+
+        cards_to_remove = [
+            [],
+            ["Xc"], #See 1 card with same suit
+            ["Xc", "Xc", "Xc"], #See 3 cards with same suit
+            ["Xc", "Xc", "Xc", "Xc", "Xc", "Xc"], #See 6 cards with same suit
+            ["Xd"], #See 1 card without same suit
+            ["Xd", "Xs", "Xh"], #See 3 cards with same suit
+            ["Xd", "Xs", "Xh", "Xd", "Xs", "Xh"], #See 6 cards with same suit
+            ["Xd", "Xs", "Xh", "Xd", "Xs", "Xh", "Xd", "Xs"], #See 8 cards with same suit
+            ["Xd", "Xs", "Xh", "Xd", "Xs", "Xh", "Xd", "Xs", "Xh", "Xd"], #See 10 cards with same suit
+        ] * len(player_hands)
+
+        num_runs = int(input("Num runs: "))
+        play_optimally = input("Play optimally? (y/n): ").lower() == "y"
+
+
+        play_style = "optimal_play" if play_optimally else "play_to_end"
+        save_path = "./Results/simulate_{}_runs_flush_cards_{}.csv".format(num_runs, play_style)
+        self.simulate(num_runs, player_hands, cards_to_remove, play_optimally=play_optimally, save_path=save_path)
+
+
+    def simulate_all_cards(self):
+        player_hands = [
+            ["14s", "14c"],
+            ["14s", "13c"],
+            ["14s", "12c"],
+            ["14s", "11c"],
+            ["14s", "10c"],
+            ["14s", "9c"],
+            ["14s", "8c"],
+            ["14s", "7c"],
+            ["14s", "6c"],
+            ["14s", "5c"],
+            ["14s", "4c"],
+            ["14s", "3c"],
+            ["14s", "2c"],
+
+            ["13s", "13c"],
+            ["13s", "12c"],
+            ["13s", "11c"],
+            ["13s", "10c"],
+            ["13s", "9c"],
+            ["13s", "8c"],
+            ["13s", "7c"],
+            ["13s", "6c"],
+            ["13s", "5c"],
+            ["13s", "4c"],
+            ["13s", "3c"],
+            ["13s", "2c"],
+
+            ["12s", "12c"],
+            ["12s", "11c"],
+            ["12s", "10c"],
+            ["12s", "9c"],
+            ["12s", "8c"],
+            ["12s", "7c"],
+            ["12s", "6c"],
+            ["12s", "5c"],
+            ["12s", "4c"],
+            ["12s", "3c"],
+            ["12s", "2c"],
+
+            ["11s", "11c"],
+            ["11s", "10c"],
+            ["11s", "9c"],
+            ["11s", "8c"],
+            ["11s", "7c"],
+            ["11s", "6c"],
+            ["11s", "5c"],
+            ["11s", "4c"],
+            ["11s", "3c"],
+            ["11s", "2c"],
+
+            ["10s", "10c"],
+            ["10s", "9c"],
+            ["10s", "8c"],
+            ["10s", "7c"],
+            ["10s", "6c"],
+            ["10s", "5c"],
+            ["10s", "4c"],
+            ["10s", "3c"],
+            ["10s", "2c"],
+
+            ["9s", "9c"],
+            ["9s", "8c"],
+            ["9s", "7c"],
+            ["9s", "6c"],
+            ["9s", "5c"],
+            ["9s", "4c"],
+            ["9s", "3c"],
+            ["9s", "2c"],
+
+            ["8s", "8c"],
+            ["8s", "7c"],
+            ["8s", "6c"],
+            ["8s", "5c"],
+            ["8s", "4c"],
+            ["8s", "3c"],
+            ["8s", "2c"],
+
+            ["7s", "7c"],
+            ["7s", "6c"],
+            ["7s", "5c"],
+            ["7s", "4c"],
+            ["7s", "3c"],
+            ["7s", "2c"],
+
+            ["6s", "6c"],
+            ["6s", "5c"],
+            ["6s", "4c"],
+            ["6s", "3c"],
+            ["6s", "2c"],
+
+            ["5s", "5c"],
+            ["5s", "4c"],
+            ["5s", "3c"],
+            ["5s", "2c"],
+
+            ["4s", "4c"],
+            ["4s", "3c"],
+            ["4s", "2c"],
+
+            ["3s", "3c"],
+            ["3s", "2c"],
+
+            ["2s", "2c"],
+
+            #Suited
+            ["14c", "13c"],
+            ["14c", "12c"],
+            ["14c", "11c"],
+            ["14c", "10c"],
+            ["14c", "9c"],
+            ["14c", "8c"],
+            ["14c", "7c"],
+            ["14c", "6c"],
+            ["14c", "5c"],
+            ["14c", "4c"],
+            ["14c", "3c"],
+            ["14c", "2c"],
+
+            ["13c", "12c"],
+            ["13c", "11c"],
+            ["13c", "10c"],
+            ["13c", "9c"],
+            ["13c", "8c"],
+            ["13c", "7c"],
+            ["13c", "6c"],
+            ["13c", "5c"],
+            ["13c", "4c"],
+            ["13c", "3c"],
+            ["13c", "2c"],
+
+            ["12c", "11c"],
+            ["12c", "10c"],
+            ["12c", "9c"],
+            ["12c", "8c"],
+            ["12c", "7c"],
+            ["12c", "6c"],
+            ["12c", "5c"],
+            ["12c", "4c"],
+            ["12c", "3c"],
+            ["12c", "2c"],
+
+            ["11c", "10c"],
+            ["11c", "9c"],
+            ["11c", "8c"],
+            ["11c", "7c"],
+            ["11c", "6c"],
+            ["11c", "5c"],
+            ["11c", "4c"],
+            ["11c", "3c"],
+            ["11c", "2c"],
+
+            ["10c", "9c"],
+            ["10c", "8c"],
+            ["10c", "7c"],
+            ["10c", "6c"],
+            ["10c", "5c"],
+            ["10c", "4c"],
+            ["10c", "3c"],
+            ["10c", "2c"],
+
+            ["9c", "8c"],
+            ["9c", "7c"],
+            ["9c", "6c"],
+            ["9c", "5c"],
+            ["9c", "4c"],
+            ["9c", "3c"],
+            ["9c", "2c"],
+
+            ["8c", "7c"],
+            ["8c", "6c"],
+            ["8c", "5c"],
+            ["8c", "4c"],
+            ["8c", "3c"],
+            ["8c", "2c"],
+
+            ["7c", "6c"],
+            ["7c", "5c"],
+            ["7c", "4c"],
+            ["7c", "3c"],
+            ["7c", "2c"],
+
+            ["6c", "5c"],
+            ["6c", "4c"],
+            ["6c", "3c"],
+            ["6c", "2c"],
+
+            ["5c", "4c"],
+            ["5c", "3c"],
+            ["5c", "2c"],
+
+            ["4c", "3c"],
+            ["4c", "2c"],
+
+            ["3c", "2c"]
+        ]
+
+
+        cards_to_remove = [
+            []
+        ] * len(player_hands)
+
+        num_runs = int(input("Num runs: "))
+
+        self.simulate(num_runs, player_hands, cards_to_remove)
+
+
+    def simulate(self, num_runs = None, player_hands=[], cards_to_remove=[], play_optimally=None, save_path=None):
+        if num_runs == None:
+            num_runs = int(input("Num runs: "))
+
+        if play_optimally == None:
+            play_optimally = input("Play optimally? (y/n): ").lower() == "y"
+
+        to_save = [self.get_header()]
+        for x in range(0, len(player_hands)):
+            num_player_wins, num_dealer_wins, num_pushes, total_profit, ending_bankroll, hand_strengths = self.simulate_many_runs(num_runs, play_optimally, player_hand=player_hands[x], cards_to_remove=cards_to_remove[x])
+
+            row = [
+                ','.join(self.convert_cards(player_hands[x])),
+                ','.join(self.convert_cards(cards_to_remove[x])),
+                self.convert_number(num_player_wins/num_runs),
+                self.convert_number(num_dealer_wins/num_runs),
+                self.convert_number(num_pushes/num_runs),
+                self.convert_number(total_profit/num_runs),
+                ending_bankroll
+            ]
+            row.extend([ (hand_strengths[key]/num_runs*100) for key in hand_strengths ])
+
+            to_save.append(row)
+
+        if play_optimally:
+            play_style = "optimal_play"
+        else:
+            play_style = "play_to_end"
+
+        if save_path == None:
+            save_path = "./Results/simulate_{}_runs_{}_cards_{}.csv".format(num_runs, len(player_hands), play_style)
+        self.save_to_csv(save_path, to_save)
+
 
     """
     simulates one game given the starting player_hand
     """
-    def simulate(self, num_runs = 1000000, play_optimally=True, player_hand=[], cards_to_remove=[]):
+    def simulate_many_runs(self, num_runs = 1000000, play_optimally=True, player_hand=[], cards_to_remove=[]):
 
         if len(player_hand) != 0:
             print("Starting player hand: "+str(self.convert_cards(player_hand)))
@@ -337,12 +540,20 @@ class MississippiStud:
         self.deck.pop(self.deck.index(self.player_hand[0]))
         self.deck.pop(self.deck.index(self.player_hand[1]))
 
+        # print("Cards to remove: {}".format(cards_to_remove))
+        # print("Len deck before: {}".format(len(self.deck)))
         #Remove cards that you would see in other player's hands
         for card in cards_to_remove:
             try:
+                #If type of card is wild, choose random card of that suit
+                if "X" in card:
+                    card = self.get_cards_same_suit(num_cards=1, suit=self.get_suit(card))[0]
+
                 self.deck.pop(self.deck.index(card))
-            except:
+            except Exception as error:
                 pass
+
+        random.shuffle(self.deck)
 
 
         #deal rest of cards
@@ -352,7 +563,7 @@ class MississippiStud:
             #player bets optimally, according to wizard-of-odds
             self.play_optimally()
         else:
-            self.play_until_end()
+            self.play_3rd_str_then_optimally()
 
 
 
@@ -365,19 +576,63 @@ class MississippiStud:
         # dealer_hand_strength = self.determine_hand_strength(self.board, self.dealer_hand)
         player_hand_strength = self.hand_strength.determine_hand_strength(self.board, self.player_hand)
 
-        self.hand_strength_distribution[player_hand_strength[0]] += 1
-
         #player wins with pair of jacks or better
         if player_hand_strength[0] >= 2 or (player_hand_strength[0] == 1 and player_hand_strength[1][0]>=11):
+            self.hand_strength_distribution[player_hand_strength[0]] += 1
             return 1
 
         #pushes with pair of 6s to pair of 10s
         elif player_hand_strength[0] == 1 and player_hand_strength[1][0]>=6:
+            self.hand_strength_distribution[player_hand_strength[0]] += 1
             return 0
 
         #player lost
         else:
+            #Only want to save high card hands, because any other hand is a losing pair, and don't want to save that.
+            if player_hand_strength[0] == 0:
+                self.hand_strength_distribution[player_hand_strength[0]] += 1
             return -1
+
+
+
+    # def get_cards_same_suit(self, num_cards, suit):
+    #     num_tries = 0
+    #     cards = []
+    #     while len(cards) < num_cards and num_tries <= 500:
+    #         random_index = random.randint(0, len(self.deck)-1)
+
+    #         if self.get_suit(self.deck[random_index]) == suit:
+    #             cards.append(self.deck.pop(random_index))
+
+    #     return cards
+
+    """
+    
+    """
+    def get_cards_same_suit(self, num_cards, suit):
+        cards = []
+        for x in range(0, len(self.deck)):
+            if self.get_suit(self.deck[x]) == suit:
+                cards.append(self.deck[x])
+
+            if len(cards) >= num_cards:
+                break
+
+        return cards
+
+    # """
+    # Given the type of card (ex: 13x), randomly find the specified number of them
+    # """
+    # def get_cards_same_value(self, num_cards, type):
+    #     cards = []
+    #     for x in range(0, len(self.deck)):
+    #         if self.get_suit(self.deck[x]) == suit:
+    #             cards.append(self.deck[x])
+
+    #         if len(cards) >= num_cards:
+    #             break
+
+    #     return cards
 
 
     # def test(self):
@@ -408,6 +663,33 @@ class MississippiStud:
         success = self.bet_3rd_street(sorted_player_hand)
         if not success:
             return 
+
+        success = self.bet_4th_street()
+        if not success:
+            return
+
+        success = self.bet_5th_street()
+        if not success:
+            return
+
+    """
+    Plays 3rd street no matter what, then plays optimally according to wizard-of-odds
+
+    Looking at player's hand, every street is bet in a way to simulate actual gameplay
+    Ante is already bet
+    """
+    def play_3rd_str_then_optimally(self):
+
+        if self.verbose:
+            print("Player's hand: "+str(self.player_hand))
+            print("Board: "+str(self.board))
+
+        sorted_player_hand = sorted(self.player_hand)
+
+        # success = self.bet_3rd_street(sorted_player_hand)
+        # if not success:
+        #     return 
+        self.bet(1, self.bet_amount)
 
         success = self.bet_4th_street()
         if not success:
@@ -455,9 +737,9 @@ class MississippiStud:
         hand_strength = self.hand_strength.determine_hand_strength(board=[], hand=self.player_hand)
 
         #Raise 3x with any pair
-        # if hand_strength[0]==1:
-        # 	bet_amount = self.bet_amount*3
-        if hand_strength[0] >= 2 or (hand_strength[0]==1 and hand_strength[1][0]>=6):
+        if hand_strength[0] == 1:
+            bet_amount = self.bet_amount*3
+        elif hand_strength[0] >= 2 or (hand_strength[0]==1 and hand_strength[1][0]>=6):
             bet_amount = self.bet_amount*3
         #raise 1x with at least 2 points
         elif points>=2:
@@ -773,7 +1055,9 @@ class MississippiStud:
 
         self.deck = deck
 
-
+    """
+    Converts a list of cards into more user-friendly denotions. EX: 12s into Qs
+    """
     def convert_cards(self, cards):
         to_return = []
         for x in range(0, len(cards)):
@@ -781,7 +1065,7 @@ class MississippiStud:
         return to_return
 
     """
-    Turns 12s into Qs
+    Converts a card into more user-friendly denotion. EX: Turns 12s into Qs
     """
     def convert_card(self, card):
 
@@ -824,12 +1108,37 @@ class MississippiStud:
 
         return after[index]
 
-    #gets the suit from the card
+    """
+    Gets the suit from the card
+    """
     def get_suit(self, card):
         return card[-1:]
 
 
-    #converts 25.000000000000000001 to 25.0
+    """
+    Saves matrix to csv file
+    """
+    def save_to_csv(self, path, data):
+        self.create_file_structure(path)
+
+        with open(path, 'w', newline='') as file:
+            contents = csv.writer(file)
+            contents.writerows(data)
+
+    """
+    Receives a string of a path, iterates through the file structure, and creates directories if they don't yet exist. 
+    Used for saving files where the whole path doesn't exist, so instead of failing, create the whole path
+    """
+    def create_file_structure(self, path):
+        directories_only = os.path.dirname(path)
+
+        # create directory if it does not exist
+        if not os.path.exists(directories_only):
+            os.makedirs(directories_only)
+
+    """
+    Converts 25.000000000000000001 to 25.0
+    """
     def convert_number(self, number):
 
         try:
