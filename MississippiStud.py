@@ -30,7 +30,7 @@ class MississippiStud:
     deck = []
     board = []
     player_hand = []
-    # dealer_hand = []
+    other_players_hands = [] #2D list of other player's hands at the table
     hand_strength_distribution = {}
 
 
@@ -49,16 +49,16 @@ class MississippiStud:
     #9 = royal flush
     #index corresponds to hand strength, [index] is amount to multiply bet by
     payout=[
-        0, #pushes, 0/1 + 1
-        2, #pays 1 to 1, 1/1 + 1
-        3, #pays 2 to 1, 2/1 + 1
-        4, #pays 3 to 1, 3/1 + 1
-        5, #pays 4 to 1, 4/1 + 1
-        7, #pays 6 to 1, 6/1 + 1
-        11, #pays 10 to 1, 10/1 + 1
-        41, #pays 40 to 1, 40/1 + 1
-        101, #pays 100 to 1, 100/1 + 1
-        501 #pays 500 to 1, 500/1 + 1
+        0, #Loses, 0/1 + 1
+        2, #Pair pays 1 to 1, 1/1 + 1
+        3, #Two pair pays 2 to 1, 2/1 + 1
+        4, #Trips pays 3 to 1, 3/1 + 1
+        5, #Straight pays 4 to 1, 4/1 + 1
+        7, #Flush pays 6 to 1, 6/1 + 1
+        11, #Full House pays 10 to 1, 10/1 + 1
+        41, #Quads pays 40 to 1, 40/1 + 1
+        101, #Straight Flush pays 100 to 1, 100/1 + 1
+        501 #Royal Flush pays 500 to 1, 500/1 + 1
     ]
 
     #if true, print statements are printed
@@ -72,8 +72,6 @@ class MississippiStud:
         self.hand_strength = HandStrength()
 
         self.reset()
-        self.board = [""]*3
-        self.player_hand = [""]*2
 
         self.verbose = False
 
@@ -81,6 +79,7 @@ class MississippiStud:
     Sets up global variables
     """
     def reset(self):
+        self.reset_hand()
         self.bankroll = self.starting_bankroll
 
         self.hand_strength_distribution = {
@@ -95,6 +94,10 @@ class MississippiStud:
             8: 0,
             9: 0,
         }
+
+    def reset_hand(self):
+        self.board = []
+        self.player_hand = [""]*2
 
 
     """
@@ -111,11 +114,11 @@ class MississippiStud:
 
 
         #play
-        if(choice==1):
-            print("Coming soon")
+        if choice == 1:
+            self.play()
 
         #simulate
-        if(choice==2):
+        if choice == 2:
             # self.simulate()
             # self.simulate_all_cards()
             # self.simulate_important_cards()
@@ -123,33 +126,147 @@ class MississippiStud:
             self.simulate_high_cards()
 
         #print best strategy
-        if(choice==3):
+        if choice == 3:
             print("Nothing here, yet")
 
-    """
-    CSV header of the results, column titles
-    """
-    def get_header(self):
-        return [
-            "Player's hand",
-            "Other player's cards",
-            "Win %",
-            "Lose %",
-            "Push %",
-            "Avg profit $",
-            "Ending bankroll $",
-            "High Card %",
-            "Pair %",
-            "Two Pair %",
-            "Trips %",
-            "Straight %",
-            "Flush %",
-            "Full House %",
-            "Quads %",
-            "Straight Flush %",
-            "Royal Flush %"
-        ]
 
+    """
+    Play a game of Mississippi Stud.
+    """
+    def play(self):
+        self.starting_bankroll = 200
+
+        self.reset()
+
+        num_other_players = int(input("Number of other players playing: "))
+
+        while self.bankroll >= self.bet_amount:
+            self.play_round(num_other_players)
+            self.clear_screen()
+            self.print_current_state()
+            choice = input("Press any key to play again, (n) to cash out: ")
+            if choice.lower() == "n":
+                break
+
+            self.reset_hand()
+        print("Final bankroll: ${}".format(self.bankroll))
+        print("Profit: ${}".format(self.bankroll - self.starting_bankroll))
+
+    """
+    Plays a single round of Mississippi Stud
+    """
+    def play_round(self, num_other_players):
+        #shuffles the deck of cards
+        self.initialize_deck()
+
+        #make bets
+        self.initial_bets()
+
+        #player gets random cards
+        self.player_hand[0] = self.deck.pop()
+        self.player_hand[1] = self.deck.pop()
+
+        #Deal to other players
+        self.other_players_hands = []
+        for x in range(num_other_players):
+            self.other_players_hands.append([self.deck.pop(), self.deck.pop()])
+
+
+        ## 3rd street
+        self.clear_screen()
+        self.print_current_state()
+        choice = self.betting_choice()
+        #Raise 1x
+        if choice == 1:
+            self.bet(1, self.bet_amount)
+        #Raise 3x
+        elif choice == 2:
+            self.bet(1, self.bet_amount*3)
+        #Fold
+        else:
+            return -1
+
+        #Deals 3rd street
+        self.board.append(self.deck.pop())
+
+
+        ## 4th street
+        self.clear_screen()
+        self.print_current_state()
+        choice = self.betting_choice()
+        #Raise 1x
+        if choice == 1:
+            self.bet(2, self.bet_amount)
+        #Raise 3x
+        elif choice == 2:
+            self.bet(2, self.bet_amount*3)
+        #Fold
+        else:
+            return -1
+
+        #Deals 4th street
+        self.board.append(self.deck.pop())
+
+
+        ## 5th street
+        self.clear_screen()
+        self.print_current_state()
+        choice = self.betting_choice()
+        #Raise 1x
+        if choice == 1:
+            self.bet(3, self.bet_amount)
+        #Raise 3x
+        elif choice == 2:
+            self.bet(3, self.bet_amount*3)
+        #Fold
+        else:
+            return -1
+
+        #Deals 4th street
+        self.board.append(self.deck.pop())
+
+
+        player_hand_strength = self.hand_strength.determine_hand_strength(self.board, self.player_hand)
+
+        #player wins with pair of jacks or better
+        if player_hand_strength[0] >= 2 or (player_hand_strength[0] == 1 and player_hand_strength[1][0]>=11):
+            self.hand_strength_distribution[player_hand_strength[0]] += 1
+            print("Won")
+            player_hand_strength = self.hand_strength.determine_hand_strength(self.board, self.player_hand)
+            payout_multiplier = self.payout[player_hand_strength[0]]
+            print("Payout {}x bets".format(payout_multiplier-1))
+            self.bankroll += sum(self.bets)*self.payout[player_hand_strength[0]]
+            return 1
+
+        #pushes with pair of 6s to pair of 10s
+        elif player_hand_strength[0] == 1 and player_hand_strength[1][0]>=6:
+            self.hand_strength_distribution[player_hand_strength[0]] += 1
+            print("Pushes")
+            self.bankroll += sum(self.bets)
+            return 0
+
+        #player lost
+        else:
+            #Only want to save high card hands, because any other hand is a losing pair, and don't want to save that.
+            if player_hand_strength[0] == 0:
+                self.hand_strength_distribution[player_hand_strength[0]] += 1
+            print("Lost")
+            return -1
+
+    """
+    Gets user input on what action to taken in regards to betting
+    """
+    def betting_choice(self):
+        choice = 0
+        while choice < 1 or choice > 3:
+            print()
+            print("Betting choice: ")
+            print("1) Raise 1x")
+            print("2) Raise 3x")
+            print("3) Fold")
+            choice = int(input("Choice: "))
+
+        return choice
 
     """
     Simulates the player having certain types of hands, like pairs, or one high card and one low card, etc. The stats should be the same between Kx5x and Jx2x since they are both one high and one low card. 
@@ -183,6 +300,19 @@ class MississippiStud:
 
         self.simulate(num_runs, player_hands, cards_to_remove)
 
+
+    """
+    Simulate change in odds if player has middle cards and other players have a lot of over cards.
+    """
+    def simulate_over_cards(self):
+        pass
+
+
+    """
+    Simulate change in odds if player has middle cards and other players have a lot of lower cards
+    """
+    def simulate_under_cards(self):
+        pass
 
     """
     Simulates change in odds if you see whether other players do or do not have the same high card.
@@ -994,8 +1124,12 @@ class MississippiStud:
     """
     def print_board_state(self):
         print()
-        print("Board: {},{},{}".format(self.convert_card(self.board[0]), self.convert_card(self.board[1]), self.convert_card(self.board[2])))
-        print("player hand: {},{}".format(self.convert_card(self.player_hand[0]), self.convert_card(self.player_hand[1])))
+        board_to_print = ",".join([ self.convert_card(card) for card in self.board ])
+        print("Board: {}".format(board_to_print))
+        print("Player hand: {},{}".format(self.convert_card(self.player_hand[0]), self.convert_card(self.player_hand[1])))
+        print()
+        for x in range(0, len(self.other_players_hands)):
+            print("Other player #{}'s hand: {}, {}".format(x+1, self.convert_card(self.other_players_hands[x][0]), self.convert_card(self.other_players_hands[x][1])))
         print()
         
 
@@ -1150,6 +1284,39 @@ class MississippiStud:
         # create directory if it does not exist
         if not os.path.exists(directories_only):
             os.makedirs(directories_only)
+
+    """
+    Clears the terminal screen
+    """
+    def clear_screen(self):
+        if os.name == "nt":
+            os.system("cls") #Clears the screen for Windows
+        else:
+            os.system("clear") #Clears the screen for Unix
+
+    """
+    CSV header of the results, column titles
+    """
+    def get_header(self):
+        return [
+            "Player's hand",
+            "Other player's cards",
+            "Win %",
+            "Lose %",
+            "Push %",
+            "Avg profit $",
+            "Ending bankroll $",
+            "High Card %",
+            "Pair %",
+            "Two Pair %",
+            "Trips %",
+            "Straight %",
+            "Flush %",
+            "Full House %",
+            "Quads %",
+            "Straight Flush %",
+            "Royal Flush %"
+        ]
 
     """
     Converts 25.000000000000000001 to 25.0

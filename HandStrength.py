@@ -90,7 +90,6 @@ class HandStrength:
         cards[value2]+=1
         suits[suit2].append(value2)
 
-
         #adds board data to lists
         for x in range(0, len(board)):
             value=int(board[x][0:len(board[x])-1])
