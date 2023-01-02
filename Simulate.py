@@ -914,12 +914,12 @@ class Simulate:
     def bet_3rd_street(self, sorted_player_hand):
         move = self.move_3rd_street(sorted_player_hand, self.player_hand, self.board)
 
-        # Bet 1x
-        if move == 1:
-            bet_amount = self.bet_amount
         # Bet 3x
-        elif move == 2:
-            bet_amount == self.bet_amount*3
+        if move == 2:
+            bet_amount = self.bet_amount*3
+        # Bet 1x
+        elif move == 1:
+            bet_amount = self.bet_amount
         # Fold
         elif move == -1:
             self.fold = True

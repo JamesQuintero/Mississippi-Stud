@@ -9,6 +9,7 @@
 import json
 import csv
 import os
+import time
 import copy
 import random
 
@@ -28,6 +29,7 @@ class Play:
     #[0] = Ante bet, [1] = 3rd street bet, [2] = 4th street bet, [3] = 5th street bet
     bets = [0,0,0,0]
     fold = False
+    play_type = 0 #0 is manual, 1 is basic strategy, 2 is custom strategy
 
     deck = []
     board = []
@@ -87,19 +89,23 @@ class Play:
 
         num_other_players = int(input("Number of other players playing: "))
 
-        auto_play = input("Auto Play? (y/n): ").lower() == "y"
+
+
+
+        # auto_play = input("Auto Play? (y/n): ").lower() == "y"
+        self.play_type = self.play_type_choice()
 
         num_rounds = 0
-        max_rounds = 2870
+        max_rounds = 1000000
         while self.bankroll >= self.bet_amount and num_rounds <= max_rounds:
-            self.play_round(num_other_players, auto_play=auto_play)
+            self.play_round(num_other_players)
             num_rounds += 1
 
-            if not auto_play:
+            if self.play_type == 1:
                 self.util.clear_screen()
             self.util.print_current_state(self.board, self.player_hand, self.other_players_hands, self.bets, self.starting_bankroll, self.bankroll, self.bet_amount)
 
-            if not auto_play:
+            if self.play_type == 1:
                 choice = input("Press any key to play again, (n) to cash out: ")
                 if choice.lower() == "n":
                     break
@@ -117,7 +123,7 @@ class Play:
 
     auto_play is True if AI will play instead of the user. 
     """
-    def play_round(self, num_other_players, auto_play=False):
+    def play_round(self, num_other_players):
         #shuffles the deck of cards
         self.deck = self.util.initialize_deck()
 
@@ -133,15 +139,15 @@ class Play:
         for x in range(num_other_players):
             self.other_players_hands.append([self.deck.pop(), self.deck.pop()])
 
-        success = self.play_3rd_street(auto_play)
+        success = self.play_3rd_street()
         if not success:
             return self.player_lost()
 
-        success = self.play_4th_street(auto_play)
+        success = self.play_4th_street()
         if not success:
             return self.player_lost()
 
-        success = self.play_5th_street(auto_play)
+        success = self.play_5th_street()
         if not success:
             return self.player_lost()
 
@@ -198,9 +204,9 @@ class Play:
     """
     Plays 3rd street with the player betting and then the card being dealt
     """
-    def play_3rd_street(self, auto_play=False):
+    def play_3rd_street(self):
         ## 3rd street
-        if not auto_play:
+        if self.play_type == 0:
             self.util.clear_screen()
 
         #Simulates possible outcomes
@@ -213,14 +219,25 @@ class Play:
         # self.util.print_current_state(self.board, self.player_hand, self.other_players_hands, self.bets, self.starting_bankroll, self.bankroll, self.bet_amount)
         # print("Recommended move: {}".format(self.recommended_move(expected_return)))
 
-        if auto_play:
-            # choice = self.recommended_move(expected_return)
+        if self.play_type == 1 or self.play_type == 3:
+            num_runs = 100000
+            num_player_wins, num_dealer_wins, num_pushes, total_profit, bankroll, _ = self.simulate.simulate_many_runs(num_runs = num_runs, play_optimally=True, player_hand=copy.copy(self.player_hand), board=copy.copy(self.board), cards_to_remove=[ card for row in self.other_players_hands for card in row ])
+            expected_return = total_profit/num_runs
+
+        # Manual play
+        if self.play_type == 1:
+            self.util.print_current_state(self.board, self.player_hand, self.other_players_hands, self.bets, self.starting_bankroll, self.bankroll, self.bet_amount)
+            print("Recommended move: {}".format(self.recommended_move(expected_return)))
+            choice = self.betting_choice()
+        # Betting strategy
+        elif self.play_type == 2:
             choice = self.basic_strategy(street=3)
+        # Custom strategy
+        elif self.play_type == 3:
+            choice = self.recommended_move(expected_return)
         else:
             choice = self.betting_choice()
-        
-
-        # input("Move AI is going to make: {}. Continue?".format(choice))
+    
         
         #Raise 1x
         if choice == 1:
@@ -241,9 +258,9 @@ class Play:
     """
     Plays 4th street with the player betting and then the card being dealt
     """
-    def play_4th_street(self, auto_play=False):
+    def play_4th_street(self):
         ## 4th street
-        if not auto_play:
+        if self.play_type == 1:
             self.util.clear_screen()
         print("Simulating expected avg return...")
         board_to_print = ",".join([ self.util.convert_card(card) for card in self.board ])
@@ -254,9 +271,22 @@ class Play:
         # self.util.print_current_state(self.board, self.player_hand, self.other_players_hands, self.bets, self.starting_bankroll, self.bankroll, self.bet_amount)
         # print("Recommended move: {}".format(self.recommended_move(expected_return)))
 
-        if auto_play:
-            # choice = self.recommended_move(expected_return)
+        if self.play_type == 1 or self.play_type == 3:
+            num_runs = 100000
+            num_player_wins, num_dealer_wins, num_pushes, total_profit, bankroll, _ = self.simulate.simulate_many_runs(num_runs = num_runs, play_optimally=True, player_hand=copy.copy(self.player_hand), board=copy.copy(self.board), cards_to_remove=[ card for row in self.other_players_hands for card in row ])
+            expected_return = total_profit/num_runs
+
+        # Manual play
+        if self.play_type == 1:
+            self.util.print_current_state(self.board, self.player_hand, self.other_players_hands, self.bets, self.starting_bankroll, self.bankroll, self.bet_amount)
+            print("Recommended move: {}".format(self.recommended_move(expected_return)))
+            choice = self.betting_choice()
+        # Betting strategy
+        elif self.play_type == 2:
             choice = self.basic_strategy(street=4)
+        # Custom strategy
+        elif self.play_type == 3:
+            choice = self.recommended_move(expected_return)
         else:
             choice = self.betting_choice()
 
@@ -280,9 +310,9 @@ class Play:
     """
     Plays 5th street with the player betting and then the card being dealt
     """
-    def play_5th_street(self, auto_play=False):
+    def play_5th_street(self):
         ## 5th street
-        if not auto_play:
+        if self.play_type == 1:
             self.util.clear_screen()
         print("Simulating expected avg return...")
         board_to_print = ",".join([ self.util.convert_card(card) for card in self.board ])
@@ -293,9 +323,22 @@ class Play:
         # self.util.print_current_state(self.board, self.player_hand, self.other_players_hands, self.bets, self.starting_bankroll, self.bankroll, self.bet_amount)
         # print("Recommended move: {}".format(self.recommended_move(expected_return)))
 
-        if auto_play:
-            # choice = self.recommended_move(expected_return)
+        if self.play_type == 1 or self.play_type == 3:
+            num_runs = 100000
+            num_player_wins, num_dealer_wins, num_pushes, total_profit, bankroll, _ = self.simulate.simulate_many_runs(num_runs = num_runs, play_optimally=True, player_hand=copy.copy(self.player_hand), board=copy.copy(self.board), cards_to_remove=[ card for row in self.other_players_hands for card in row ])
+            expected_return = total_profit/num_runs
+
+        # Manual play
+        if self.play_type == 1:
+            self.util.print_current_state(self.board, self.player_hand, self.other_players_hands, self.bets, self.starting_bankroll, self.bankroll, self.bet_amount)
+            print("Recommended move: {}".format(self.recommended_move(expected_return)))
+            choice = self.betting_choice()
+        # Betting strategy
+        elif self.play_type == 2:
             choice = self.basic_strategy(street=5)
+        # Custom strategy
+        elif self.play_type == 3:
+            choice = self.recommended_move(expected_return)
         else:
             choice = self.betting_choice()
 
@@ -365,6 +408,25 @@ class Play:
             print("1) Raise 1x")
             print("2) Raise 3x")
             print("3) Fold")
+            try:
+                choice = int(input("Choice: "))
+            except:
+                choice = 0
+
+        return choice
+
+
+    """
+    User chooses what play style they want to initiate
+    """
+    def play_type_choice(self):
+        choice = 0
+        while choice < 1 or choice > 3:
+            print()
+            print("Play type choice: ")
+            print("1) Manual (Player chooses the moves)")
+            print("2) Auto basic strategy")
+            print("3) Auto custom strategy")
             try:
                 choice = int(input("Choice: "))
             except:
