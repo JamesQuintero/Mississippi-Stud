@@ -1,0 +1,9 @@
+"1: Simulating 100,000 games each play to determine expected profit. If it's greater than what's been bet, then continue. If it's less, then fold. ",,,,
+2: Basic strategy,,,,
+3: Play to the end,,,,
+,,,,
+,,,,
+,# other cards,Num rounds,Final bankroll,Profit per round
+1,6,2870,"$95,920 ",($1.42)
+1,6,2876,"$92,960 ",($2.45)
+2,0,2870,"$88,010 ",($4.18)

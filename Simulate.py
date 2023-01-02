@@ -111,32 +111,99 @@ class Simulate:
     Simulate change in odds if player has middle cards and other players have a lot of over cards.
     """
     def simulate_over_cards(self):
-        pass
+        player_hands = [
+            ["10c", "9d"], #Two middle cards
+            ["10c", "9d"], #Two middle cards
+            ["10c", "9d"], #Two middle cards
+            ["10c", "9d"], #Two middle cards
+            ["10c", "9d"], #Two middle cards
+            ["10c", "9d"], #Two middle cards
+        ]
+
+        cards_to_remove = [
+            [],
+            ["11x"], #Sees 1 over card
+            ["11x", "14x", "13x"], #Sees 3 over cards
+            ["11x", "14x", "13x", "12x", "11x", "14x"], #Sees 6 over cards
+            ["11x", "14x", "13x", "12x", "11x", "14x", "13x", "12x"], #Sees 8 over cards
+            ["11x", "14x", "13x", "12x", "11x", "14x", "13x", "12x", "11x", "14x"], #Sees 10 over cards
+        ]
+
+        num_runs = int(input("Num runs: "))
+        play_optimally = input("Play optimally? (y/n): ").lower() == "y"
+
+
+        play_style = "optimal_play" if play_optimally else "play_to_end"
+        save_path = "./Results/simulate_{}_runs_over_cards_{}.csv".format(num_runs, play_style)
+        self.simulate(num_runs, player_hands, cards_to_remove, play_optimally=play_optimally, save_path=save_path)
 
 
     """
     Simulate change in odds if player has middle cards and other players have a lot of lower cards
     """
     def simulate_under_cards(self):
-        pass
+        player_hands = [
+            ["10c", "9d"], #Two middle cards
+            ["10c", "9d"], #Two middle cards
+            ["10c", "9d"], #Two middle cards
+            ["10c", "9d"], #Two middle cards
+            ["10c", "9d"], #Two middle cards
+            ["10c", "9d"], #Two middle cards
+        ]
+
+        cards_to_remove = [
+            [],
+            ["2x"], #Sees 1 under card
+            ["2x", "5x", "3x"], #Sees 3 under cards
+            ["2x", "5x", "3x", "4x", "2x", "5x"], #Sees 6 under cards
+            ["2x", "5x", "3x", "4x", "2x", "5x", "3x", "4x"], #Sees 8 under cards
+            ["2x", "5x", "3x", "4x", "2x", "5x", "3x", "4x", "2x", "5x"], #Sees 10 under cards
+        ]
+
+        num_runs = int(input("Num runs: "))
+        play_optimally = input("Play optimally? (y/n): ").lower() == "y"
+
+
+        play_style = "optimal_play" if play_optimally else "play_to_end"
+        save_path = "./Results/simulate_{}_runs_under_cards_{}.csv".format(num_runs, play_style)
+        self.simulate(num_runs, player_hands, cards_to_remove, play_optimally=play_optimally, save_path=save_path)
 
     """
     Simulates change in odds if you see whether other players do or do not have the same high card.
     """
     def simulate_high_cards(self):
         player_hands = [
-            ["13c", "11d"], #One high card
-            ["13c", "11d"], #One high card
-            ["13c", "11d"], #One high card
-            ["13c", "11d"], #One high card
-            ["13c", "11d"], #One high card
-            ["13c", "11d"], #One high card
-            ["13c", "11d"], #One high card
-            ["13c", "11d"], #One high card
-            ["13c", "11d"], #One high card
+            ["13c", "11d"], #Two high cards
+            ["13c", "11d"], #Two high card
+            ["13c", "11d"], #Two high card
+            ["13c", "11d"], #Two high card
+            ["13c", "11d"], #Two high card
+            ["13c", "11d"], #Two high card
+            ["13c", "11d"], #Two high card
+            ["13c", "11d"], #Two high card
+            ["13c", "11d"], #Two high card
+
+            ["13c", "2d"], #One high card
+            ["13c", "2d"], #One high card
+            ["13c", "2d"], #One high card
+            ["13c", "2d"], #One high card
+            ["13c", "2d"], #One high card
+            ["13c", "2d"], #One high card
+            ["13c", "2d"], #One high card
+            ["13c", "2d"], #One high card
+            ["13c", "2d"], #One high card
         ]
 
         cards_to_remove = [
+            [],
+            ["13x"], #See 1 card is same
+            ["13x", "13x"], #See 2 cards are the same
+            ["13x", "13x", "13x"], #See 3 other cards are the same
+            ["2x"], #See 1 card not same type
+            ["2x", "14x", "3x"], #See 3 cards not same type
+            ["2x", "14x", "3x", "12x", "4x", "10x"], #See 6 cards not same type
+            ["2x", "14x", "3x", "12x", "4x", "10x", "5x", "9x"], #See 8 cards not same type
+            ["2x", "14x", "3x", "12x", "4x", "10x", "5x", "9x", "6x", "8x"], #See 10 cards not same type
             [],
             ["13x"], #See 1 card is same
             ["13x", "13x"], #See 2 cards are the same
@@ -154,6 +221,78 @@ class Simulate:
 
         play_style = "optimal_play" if play_optimally else "play_to_end"
         save_path = "./Results/simulate_{}_runs_high_cards_{}.csv".format(num_runs, play_style)
+        self.simulate(num_runs, player_hands, cards_to_remove, play_optimally=play_optimally, save_path=save_path)
+
+
+    """
+    Simulates change in odds if you see whether other players do or do not have the same middle cards.
+    """
+    def simulate_middle_cards(self):
+        player_hands = [
+            ["10c", "6d"], #Two middle cards
+            ["10c", "6d"], #Two middle cards
+            ["10c", "6d"], #Two middle cards
+            ["10c", "6d"], #Two middle cards
+            ["10c", "6d"], #Two middle cards
+            ["10c", "6d"], #Two middle cards
+            ["10c", "6d"], #Two middle cards
+            ["10c", "6d"], #Two middle cards
+            ["10c", "6d"], #Two middle cards
+            ["10c", "6d"], #Two middle cards
+            ["10c", "6d"], #Two middle cards
+        ]
+
+        cards_to_remove = [
+            [],
+            ["10x"], #See 1 card is same
+            ["10x", "10x"], #See 2 cards are the same
+            ["10x", "10x", "10x"], #See 3 other cards are the same
+            ["10x", "6x"], #See 2 cards are the same
+            ["10x", "6x", "10x", "6x"], #See 3 other cards are the same
+            ["2x"], #See 1 card not same type
+            ["2x", "14x", "3x"], #See 3 cards not same type
+            ["2x", "14x", "3x", "12x", "4x", "11x"], #See 6 cards not same type
+            ["2x", "14x", "3x", "12x", "4x", "11x", "5x", "9x"], #See 8 cards not same type
+            ["2x", "14x", "3x", "12x", "4x", "11x", "5x", "9x", "7x", "8x"], #See 10 cards not same type
+        ]
+
+        num_runs = int(input("Num runs: "))
+        play_optimally = input("Play optimally? (y/n): ").lower() == "y"
+
+
+        play_style = "optimal_play" if play_optimally else "play_to_end"
+        save_path = "./Results/simulate_{}_runs_middle_cards_{}.csv".format(num_runs, play_style)
+        self.simulate(num_runs, player_hands, cards_to_remove, play_optimally=play_optimally, save_path=save_path)
+
+
+    """
+    Simulates change in odds if you see whether other players do or do not have the same middle cards.
+    """
+    def simulate_low_cards(self):
+        player_hands = [
+            ["5c", "2d"], #Two low cards
+            ["5c", "2d"], #Two low cards
+            ["5c", "2d"], #Two low cards
+            ["5c", "2d"], #Two low cards
+            ["5c", "2d"], #Two low cards
+            ["5c", "2d"], #Two low cards
+        ]
+
+        cards_to_remove = [
+            [],
+            ["3x"], #See 1 card not same type
+            ["3x", "14x", "3x"], #See 3 cards not same type
+            ["3x", "14x", "3x", "12x", "4x", "11x"], #See 6 cards not same type
+            ["3x", "14x", "3x", "12x", "4x", "11x", "6x", "9x"], #See 8 cards not same type
+            ["3x", "14x", "3x", "12x", "4x", "11x", "6x", "9x", "7x", "8x"], #See 10 cards not same type
+        ]
+
+        num_runs = int(input("Num runs: "))
+        play_optimally = input("Play optimally? (y/n): ").lower() == "y"
+
+
+        play_style = "optimal_play" if play_optimally else "play_to_end"
+        save_path = "./Results/simulate_{}_runs_low_cards_{}.csv".format(num_runs, play_style)
         self.simulate(num_runs, player_hands, cards_to_remove, play_optimally=play_optimally, save_path=save_path)
 
 
@@ -401,14 +540,15 @@ class Simulate:
         ] * len(player_hands)
 
         num_runs = int(input("Num runs: "))
+        play_optimally = input("Play optimally? (y/n): ").lower() == "y"
 
-        self.simulate(num_runs, player_hands, cards_to_remove)
+        self.simulate(num_runs, player_hands, cards_to_remove=cards_to_remove, play_optimally=play_optimally)
 
 
     """
     Runs through all provided player hands to simulate many games for each hand.
     """
-    def simulate(self, num_runs = None, player_hands=[], cards_to_remove=[], play_optimally=None, save_path=None):
+    def simulate(self, num_runs = None, player_hands=[], board=[], cards_to_remove=[], play_optimally=None, save_path=None):
         if num_runs == None:
             num_runs = int(input("Num runs: "))
 
@@ -417,7 +557,7 @@ class Simulate:
 
         to_save = [self.util.get_header()]
         for x in range(0, len(player_hands)):
-            num_player_wins, num_dealer_wins, num_pushes, total_profit, ending_bankroll, hand_strengths = self.simulate_many_runs(num_runs, play_optimally, player_hand=player_hands[x], cards_to_remove=cards_to_remove[x])
+            num_player_wins, num_dealer_wins, num_pushes, total_profit, ending_bankroll, hand_strengths = self.simulate_many_runs(num_runs, play_optimally, player_hand=player_hands[x], board=board, cards_to_remove=cards_to_remove[x])
 
             row = [
                 ','.join(self.util.convert_cards(player_hands[x])),
@@ -445,7 +585,7 @@ class Simulate:
     """
     Simulates one game many times given the starting player_hand
     """
-    def simulate_many_runs(self, num_runs = 1000000, play_optimally=True, player_hand=[], cards_to_remove=[]):
+    def simulate_many_runs(self, num_runs = 1000000, play_optimally=True, player_hand=[], board=[], cards_to_remove=[]):
 
         if len(player_hand) != 0:
             print("Starting player hand: "+str(self.util.convert_cards(player_hand)))
@@ -464,7 +604,7 @@ class Simulate:
 
             starting_bankroll = self.bankroll
 
-            winner = self.simulate_single(play_optimally, player_hand, cards_to_remove)
+            winner = self.simulate_single(play_optimally, player_hand=player_hand, board=board, cards_to_remove=cards_to_remove)
 
             #player wins with pair of jacks or better
             if winner == 1:
@@ -511,7 +651,7 @@ class Simulate:
     """
     Simulates a single game. Returns 1 if player wins, -1 if dealer wins, and 0 if push
     """
-    def simulate_single(self, play_optimally=True, player_hand=None, cards_to_remove=[]):
+    def simulate_single(self, play_optimally=True, player_hand=None, board=[], cards_to_remove=[]):
 
         #shuffles the deck of cards
         self.deck = self.util.initialize_deck()
@@ -541,7 +681,7 @@ class Simulate:
 
                 self.deck.pop(self.deck.index(card))
             except Exception as error:
-                print("Error: {}".format(error))
+                input("Error: {}".format(error))
                 pass
 
         #Shuffles since we removed cards from the bottom of the deck.
@@ -549,7 +689,7 @@ class Simulate:
 
 
         #deal rest of cards
-        self.deal()
+        self.deal(initial_board=board)
 
         if play_optimally:
             #player bets optimally, according to wizard-of-odds
@@ -596,7 +736,8 @@ class Simulate:
 
         if self.verbose:
             print("Player's hand: "+str(self.player_hand))
-            print("Board: "+str(self.board))
+            board_to_print = ",".join([ self.util.convert_card(card) for card in self.board ])
+            print("Board: {}".format(board_to_print))
 
         sorted_player_hand = sorted(self.player_hand)
 
@@ -622,7 +763,8 @@ class Simulate:
 
         if self.verbose:
             print("Player's hand: "+str(self.player_hand))
-            print("Board: "+str(self.board))
+            board_to_print = ",".join([ self.util.convert_card(card) for card in self.board ])
+            print("Board: {}".format(board_to_print))
 
         #Bets 3rd street no matter what
         self.bet(1, self.bet_amount)
@@ -644,19 +786,22 @@ class Simulate:
 
         if self.verbose:
             print("Player's hand: "+str(self.player_hand))
-            print("Board: "+str(self.board))
+            board_to_print = ",".join([ self.util.convert_card(card) for card in self.board ])
+            print("Board: {}".format(board_to_print))
 
         sorted_player_hand = sorted(self.player_hand)
 
         self.bet(1, self.bet_amount)
         self.bet(2, self.bet_amount)
         self.bet(3, self.bet_amount)
-        
+
 
     """
-    Basic strategy way to play 3rd street (1st community card)
+    Returns the basic strategy move for 3rd street (1st community card)
+
+    Strategy from wizardofodds.com
     """
-    def bet_3rd_street(self, sorted_player_hand):
+    def move_3rd_street(self, sorted_player_hand, player_hand, board):
         ###
         #bets 3rd street
         #To bet 3rd street, you can only see your cards, which is street="ante"
@@ -666,36 +811,27 @@ class Simulate:
         # - Raise 1x with 6/5 suited.
         # Fold all others.
 
-        bet_amount = 0
+        points = self.get_num_points(street="ante", player_hand=player_hand, board=board)
 
-        points = self.get_num_points(street="ante")
-
-        hand_strength = self.hand_strength.determine_hand_strength(board=[], hand=self.player_hand)
+        hand_strength = self.hand_strength.determine_hand_strength(board=[], hand=player_hand)
 
         #Raise 3x with any pair
         if hand_strength[0] == 1:
-            bet_amount = self.bet_amount*3
+            return 2
         elif hand_strength[0] >= 2 or (hand_strength[0]==1 and hand_strength[1][0]>=6):
-            bet_amount = self.bet_amount*3
+            return 2
         #raise 1x with at least 2 points
         elif points>=2:
-            bet_amount = self.bet_amount
+            return 1
+            # bet_amount = self.bet_amount*3
         #Raise 1x with 6/5 suited
         elif sorted_player_hand[0][0]==5 and sorted_player_hand[1][0]==6 and sorted_player_hand[0][1]==sorted_player_hand[1][1]:
-            bet_amount = self.bet_amount
+            return 1
         else:
-            self.fold = True
-            return False
+            return -1
 
-        # self.bets[1] = bet_amount
-        self.bet(1, bet_amount)
 
-        return True
-    
-    """
-    Basic strategy way to play 4th street (2nd community card)
-    """
-    def bet_4th_street(self):
+    def move_4th_street(self, player_hand, board):
         ###
         # bets 4th card (4th street)
         # To bet 2nd street, you can only see your cards and the first board card, which is street="3rd"
@@ -711,37 +847,28 @@ class Simulate:
         # Raise 1x with a straight draw, with one gap, and two mid cards.
         # - Fold all others.
 
-        bet_amount = 0
+        points = self.get_num_points(street="3rd", player_hand=player_hand, board=board)
 
-        points = self.get_num_points(street="3rd")
-
-        hand_strength = self.hand_strength.determine_hand_strength(board=[self.board[0]], hand=self.player_hand)
+        hand_strength = self.hand_strength.determine_hand_strength(board=[board[0]], hand=player_hand)
 
         #Raise 3x with any made hand (mid pair or higher)
         if hand_strength[0] >= 2 or (hand_strength[0]==1 and hand_strength[1][0]>=6):
-            bet_amount = self.bet_amount*3
+            return 2
         #Raise 1x with a low pair
         elif hand_strength[0]==1:
-            bet_amount = self.bet_amount
+            return 1
         #raise 1x with at least 3 points
         elif points>=3:
-            bet_amount = self.bet_amount
+            return 1
         #Raise 1x with any other three suited cards
-        elif self.util.get_suit(self.player_hand[0])==self.util.get_suit(self.player_hand[1]) and self.util.get_suit(self.player_hand[1])==self.util.get_suit(self.board[0]):
-            bet_amount = self.bet_amount
+        elif self.util.get_suit(player_hand[0])==self.util.get_suit(player_hand[1]) and self.util.get_suit(player_hand[1])==self.util.get_suit(board[0]):
+            return 1
         #Fold all others
         else:
-            self.fold = True
-            return False
+            return -1
 
-        self.bet(2, bet_amount)
 
-        return True
-
-    """
-    Basic strategy way to play 5th street (3rd community card)
-    """
-    def bet_5th_street(self):
+    def move_5th_street(self, player_hand, board, bets):
         ###
         # bets 5th card (5th street)
         # - Raise 3x with any made hand (mid pair or higher).
@@ -753,31 +880,92 @@ class Simulate:
         # - Raise 1x with three mid cards and at least one previous 3x raise.
         # - Fold all others.
 
-        bet_amount = 0
+        if len(board) < 2:
+            print("Error when determing move for 5th street, board is not proper length. {} vs expected 2".format(len(board)))
 
-        points = self.get_num_points(street="4th")
+        points = self.get_num_points(street="4th", player_hand=player_hand, board=board)
 
-        hand_strength = self.hand_strength.determine_hand_strength(board=self.board[0:2], hand=self.player_hand)
+        hand_strength = self.hand_strength.determine_hand_strength(board=board[0:2], hand=player_hand)
 
         
         #Raise 3x with any made hand (mid pair or higher)
         if hand_strength[0] >= 2 or (hand_strength[0]==1 and hand_strength[1][0]>=6):
-            bet_amount = self.bet_amount*3
+            return 2
         #Raise 3x with any four to a flush
-        elif self.util.get_suit(self.player_hand[0])==self.util.get_suit(self.player_hand[1]) and \
-            self.util.get_suit(self.player_hand[1])==self.util.get_suit(self.board[0]) and \
-            self.util.get_suit(self.player_hand[1])==self.util.get_suit(self.board[1]):
-            bet_amount = self.bet_amount*3
+        elif self.util.get_suit(player_hand[0])==self.util.get_suit(player_hand[1]) and \
+            self.util.get_suit(player_hand[1])==self.util.get_suit(board[0]) and \
+            self.util.get_suit(player_hand[1])==self.util.get_suit(board[1]):
+            return 2
         #Raise 1x with a low pair
         elif hand_strength[0]==1:
-            bet_amount = self.bet_amount
+            return 1
         #raise 1x with at least 4 points or Raise 1x with three mid cards and at least one previous 3x raise
-        elif points>=4 or (points>=3 and self.bet_amount*3 in self.bets):
-            bet_amount = self.bet_amount
+        elif points >= 4 or (points>=3 and self.bet_amount*3 in bets):
+            return 1
         #Fold all others
         else:
+            return -1
+
+        
+
+    """
+    Basic strategy way to play 3rd street (1st community card)
+    """
+    def bet_3rd_street(self, sorted_player_hand):
+        move = self.move_3rd_street(sorted_player_hand, self.player_hand, self.board)
+
+        # Bet 1x
+        if move == 1:
+            bet_amount = self.bet_amount
+        # Bet 3x
+        elif move == 2:
+            bet_amount == self.bet_amount*3
+        # Fold
+        elif move == -1:
             self.fold = True
-            return
+            return False
+
+        self.bet(1, bet_amount)
+
+        return True
+    
+    """
+    Basic strategy way to play 4th street (2nd community card)
+    """
+    def bet_4th_street(self):
+        move = self.move_4th_street(self.player_hand, self.board)
+
+        # Bet 3x
+        if move == 2:
+            bet_amount = self.bet_amount*3
+        # Bet 1x
+        elif move == 1:
+            bet_amount = self.bet_amount
+        # Fold
+        elif move == -1:
+            self.fold = True
+            return False
+
+        self.bet(2, bet_amount)
+
+        return True
+
+    """
+    Basic strategy way to play 5th street (3rd community card)
+    """
+    def bet_5th_street(self):
+        move = self.move_5th_street(self.player_hand, self.board, self.bets)
+
+        # Bet 3x
+        if move == 2:
+            bet_amount = self.bet_amount*3
+        # Bet 1x
+        elif move == 1:
+            bet_amount = self.bet_amount
+        # Fold
+        elif move == -1:
+            self.fold = True
+            return False
 
         self.bet(3, bet_amount)
 
@@ -799,23 +987,29 @@ class Simulate:
 
     street values = ["ante", "3rd", "4th", "5th"]
     """
-    def get_num_points(self, street="ante"):
+    def get_num_points(self, street="ante", player_hand=[], board=[]):
 
         #only want points of player's hand
         if street == "ante":
-            cards = self.player_hand
+            cards = player_hand
 
         #want points of player's hand and first card of board
         elif street == "3rd":
-            cards = self.board[0:1] + self.player_hand
+            try:
+                cards = board[0:1] + player_hand
+            except Exception as error:
+                print("Error, {}".format(error))
 
         #want points of player's hand and first two cards of board
         elif street == "4th":
-            cards = self.board[0:2] + self.player_hand
+            try:
+                cards = board[0:2] + player_hand
+            except Exception as error:
+                print("Error, {}".format(error))
 
         #want points of player's hand and first two cards of board
         elif street == "5th":
-            cards = self.board + self.player_hand
+            cards = board + player_hand
 
         #gets points of all cards
         points = 0
@@ -856,17 +1050,40 @@ class Simulate:
         self.bankroll -= amount
 
     """
-    deals community cards and other player's cards
+    deals community cards
 
     board only has 3 cards in mississippi stud
     """
-    def deal(self):
-        self.board = []
-        self.board.append(self.deck.pop())
-        self.board.append(self.deck.pop())
-        self.board.append(self.deck.pop())
+    def deal(self, initial_board=[]):
 
+        # print("Dealing! Initial board: {}".format(initial_board))
+        # print("Current board: {}".format(self.board))
+        # print("Deck size: {}".format(len(self.deck)))
+        self.board = copy.copy(initial_board)
+
+        #Removes used cards from deck
+        for card in initial_board:
+            self.deck.remove(card)
+
+        
+        # print(self.board)
+
+        #Deals remaining board
+        while len(self.board) < 3:
+            self.board.append(self.deck.pop())
+
+        # print("Self.board now: {}".format(self.board))
+        # input("what")
+        
 
 if __name__=="__main__":
     simulate = Simulate()
-    simulate.simulate_high_cards()
+    # simulate.simulate_high_cards()
+    # simulate.simulate_over_cards()
+    # simulate.simulate_under_cards()
+    # simulate.simulate_middle_cards()
+    # simulate.simulate_low_cards()
+
+    # simulate.simulate_single(play_optimally=False, player_hand=["10c", "2c"], board=["8h", "6d", "8s"], cards_to_remove=[])
+    simulate.simulate_many_runs(num_runs = 100000, play_optimally=True, player_hand=['8d', '12c'], board=[], cards_to_remove=['9s', '4h', '4d', '2h', '12d', '2d'])
+    simulate.util.print_current_state(simulate.board, simulate.player_hand, simulate.other_players_hands, simulate.bets, simulate.starting_bankroll, simulate.bankroll, simulate.bet_amount)
