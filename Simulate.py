@@ -649,6 +649,123 @@ class Simulate:
 
 
     """
+    Simulates one game many times given the starting player_hand
+    """
+    def simulate_many_runs_multiprocessing(self, num_runs = 1000, play_optimally=True, player_hand=[], board=[], cards_to_remove=[]):
+
+        if player_hand != None and len(player_hand) != 0:
+            print("Starting player hand: "+str(self.util.convert_cards(player_hand)))
+        if cards_to_remove != None and len(cards_to_remove) != 0:
+            print("Cards in other player's hand: {}".format(self.util.convert_cards(cards_to_remove)))
+
+
+        self.reset()
+
+        num_player_wins = 0
+        num_dealer_wins = 0
+        num_pushes = 0
+        total_profit = 0
+
+        import multiprocessing
+
+        parameters = [(play_optimally, player_hand, board, cards_to_remove) for _ in range(num_runs)]
+
+        num_processors = 32
+        pool = multiprocessing.Pool(num_processors)
+        results = pool.starmap(self.simulate_single_full, parameters)
+        pool.close()
+        pool.join()
+
+        # Initialize the variables
+        num_player_wins = 0
+        num_dealer_wins = 0
+        num_pushes = 0
+        total_profit = 0
+
+        # Iterate over the results and update the variables
+        for result in results:
+            winner, bankroll_diff, player_hand_strength = result
+
+            #player wins with pair of jacks or better
+            if winner == 1:
+                self.hand_strength_distribution[player_hand_strength] += 1
+                num_player_wins += 1
+
+            #pushes with pair of 6s to pair of 10s
+            elif winner == 0:
+                self.hand_strength_distribution[player_hand_strength] += 1
+                num_pushes += 1
+
+            #player lost
+            else:
+                num_dealer_wins += 1
+
+            self.bankroll += bankroll_diff
+            total_profit += bankroll_diff
+
+
+        # ending_bankroll = self.bankroll
+        # bankroll_diff = ending_bankroll - starting_bankroll
+        # total_profit += bankroll_diff
+
+
+
+        # if x != 0 and x % 100000 == 0:
+        #     print("Hand #"+str(x))
+
+
+        self.util.print_bankroll_state(self.starting_bankroll, self.bankroll, self.bet_amount)
+
+        print("Num player wins: {:,}".format(num_player_wins))
+        print("Num dealer wins: {:,}".format(num_dealer_wins))
+        print("Num pushes: {:,}".format(num_pushes))
+        print("Win %: {:.2f}%".format(num_player_wins/num_runs*100))
+        print("Lose %: {:.2f}%".format(num_dealer_wins/num_runs*100))
+        print("Push %: {:.2f}%".format(num_pushes/num_runs*100))
+        print("Avg return per hand: ${:,.2f}".format(total_profit/num_runs))
+        print()
+        self.util.print_hand_strength_distribution(self.hand_strength_distribution, num_runs)
+        print()
+
+        print(num_player_wins, num_dealer_wins, num_pushes, total_profit, self.bankroll, copy.deepcopy(self.hand_strength_distribution))
+
+        return num_player_wins, num_dealer_wins, num_pushes, total_profit, self.bankroll, copy.deepcopy(self.hand_strength_distribution)
+
+
+    """
+    Returns change in bankroll
+    """
+    def simulate_single_full(self, play_optimally=True, player_hand=None, board=[], cards_to_remove=[]):
+        starting_bankroll = self.bankroll
+
+        winner = self.simulate_single(play_optimally, player_hand=player_hand, board=board, cards_to_remove=cards_to_remove)
+
+        player_hand_strength = self.hand_strength.determine_hand_strength(self.board, self.player_hand)
+        # player_hand_strength = [0, 0]
+
+        #player wins with pair of jacks or better
+        if winner == 1:
+            self.bankroll += sum(self.bets)*self.util.payout[player_hand_strength[0]]
+
+            ending_bankroll = self.bankroll
+            bankroll_diff = ending_bankroll - starting_bankroll
+
+            return 1, bankroll_diff, player_hand_strength[0]
+
+        #pushes with pair of 6s to pair of 10s
+        elif winner == 0:
+            self.bankroll += sum(self.bets)
+            ending_bankroll = self.bankroll
+            bankroll_diff = ending_bankroll - starting_bankroll
+
+            return 0, bankroll_diff, player_hand_strength[0]
+
+        #player lost
+        else:
+            return -1, -sum(self.bets), 0
+
+
+    """
     Simulates a single game. Returns 1 if player wins, -1 if dealer wins, and 0 if push
     """
     def simulate_single(self, play_optimally=True, player_hand=None, board=[], cards_to_remove=[]):
@@ -660,14 +777,14 @@ class Simulate:
         self.initial_bets()
 
         #player gets random cards
-        if player_hand == None:
+        if player_hand == None or len(player_hand) == 0:
             self.player_hand[0] = self.deck.pop()
             self.player_hand[1] = self.deck.pop()
-
         #player gets certain cards
-        self.player_hand = player_hand
-        self.deck.pop(self.deck.index(self.player_hand[0]))
-        self.deck.pop(self.deck.index(self.player_hand[1]))
+        else:
+            self.player_hand = player_hand
+            self.deck.pop(self.deck.index(self.player_hand[0]))
+            self.deck.pop(self.deck.index(self.player_hand[1]))
 
         #Remove cards that you would see in other player's hands
         for card in cards_to_remove:
@@ -684,7 +801,7 @@ class Simulate:
                 input("Error: {}".format(error))
                 pass
 
-        #Shuffles since we removed cards from the bottom of the deck.
+        #Shuffles since we might have removed flush cards from the bottom of the deck.
         random.shuffle(self.deck)
 
 
@@ -1085,5 +1202,16 @@ if __name__=="__main__":
     # simulate.simulate_low_cards()
 
     # simulate.simulate_single(play_optimally=False, player_hand=["10c", "2c"], board=["8h", "6d", "8s"], cards_to_remove=[])
-    simulate.simulate_many_runs(num_runs = 100000, play_optimally=True, player_hand=['8d', '12c'], board=[], cards_to_remove=['9s', '4h', '4d', '2h', '12d', '2d'])
-    simulate.util.print_current_state(simulate.board, simulate.player_hand, simulate.other_players_hands, simulate.bets, simulate.starting_bankroll, simulate.bankroll, simulate.bet_amount)
+    # simulate.simulate_many_runs(num_runs = 100000, play_optimally=True, player_hand=['8d', '12c'], board=[], cards_to_remove=['9s', '4h', '4d', '2h', '12d', '2d'])
+    # simulate.util.print_current_state(simulate.board, simulate.player_hand, simulate.other_players_hands, simulate.bets, simulate.starting_bankroll, simulate.bankroll, simulate.bet_amount)
+
+    import time
+    start_time = time.perf_counter()
+    simulate.simulate_many_runs_multiprocessing(num_runs = 100000, play_optimally=True, player_hand=None, board=[], cards_to_remove=[])
+    end_time = time.perf_counter()
+    # Calculate the elapsed time
+    elapsed_time = end_time - start_time
+
+    # Convert the elapsed time to milliseconds
+    elapsed_time_milliseconds = elapsed_time * 1000
+    print("Elapsed time: ", elapsed_time_milliseconds, " milliseconds")
