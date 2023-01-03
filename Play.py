@@ -83,7 +83,8 @@ class Play:
     """
     def play(self):
         # self.starting_bankroll = 200
-        self.starting_bankroll = 100000
+        # self.starting_bankroll = 1000000
+        self.starting_bankroll = 1000
 
         self.reset()
 
@@ -96,7 +97,7 @@ class Play:
         self.play_type = self.play_type_choice()
 
         num_rounds = 0
-        max_rounds = 1000000
+        max_rounds = 10000
         while self.bankroll >= self.bet_amount and num_rounds <= max_rounds:
             self.play_round(num_other_players)
             num_rounds += 1
@@ -222,19 +223,16 @@ class Play:
         if self.play_type == 1 or self.play_type == 3:
             start_time = time.perf_counter()
 
-            #Execution time for 100,000 runs is 2.4 seconds for a foldable hand, and 3.8 seconds for a playable hand.
+            #Execution time for 100,000 runs on a single processor is 2.4 seconds for a foldable hand, and 3.8 seconds for a playable hand.
 
             num_runs = 100000
             num_player_wins, num_dealer_wins, num_pushes, total_profit, bankroll, _ = self.simulate.simulate_many_runs_multiprocessing(num_runs = num_runs, play_optimally=True, player_hand=copy.copy(self.player_hand), board=copy.copy(self.board), cards_to_remove=[ card for row in self.other_players_hands for card in row ])
             expected_return = total_profit/num_runs
 
             end_time = time.perf_counter()
-            # Calculate the elapsed time
             elapsed_time = end_time - start_time
-
-            # Convert the elapsed time to milliseconds
             elapsed_time_milliseconds = elapsed_time * 1000
-            print("Elapsed time: ", elapsed_time_milliseconds, " milliseconds")
+            print("Elapsed simulation time: ", elapsed_time_milliseconds, " milliseconds")
 
         # Manual play
         if self.play_type == 1:

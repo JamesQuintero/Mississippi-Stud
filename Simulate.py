@@ -714,20 +714,18 @@ class Simulate:
         #     print("Hand #"+str(x))
 
 
-        self.util.print_bankroll_state(self.starting_bankroll, self.bankroll, self.bet_amount)
+        # self.util.print_bankroll_state(self.starting_bankroll, self.bankroll, self.bet_amount)
 
-        print("Num player wins: {:,}".format(num_player_wins))
-        print("Num dealer wins: {:,}".format(num_dealer_wins))
-        print("Num pushes: {:,}".format(num_pushes))
-        print("Win %: {:.2f}%".format(num_player_wins/num_runs*100))
-        print("Lose %: {:.2f}%".format(num_dealer_wins/num_runs*100))
-        print("Push %: {:.2f}%".format(num_pushes/num_runs*100))
-        print("Avg return per hand: ${:,.2f}".format(total_profit/num_runs))
-        print()
-        self.util.print_hand_strength_distribution(self.hand_strength_distribution, num_runs)
-        print()
-
-        print(num_player_wins, num_dealer_wins, num_pushes, total_profit, self.bankroll, copy.deepcopy(self.hand_strength_distribution))
+        # print("Num player wins: {:,}".format(num_player_wins))
+        # print("Num dealer wins: {:,}".format(num_dealer_wins))
+        # print("Num pushes: {:,}".format(num_pushes))
+        # print("Win %: {:.2f}%".format(num_player_wins/num_runs*100))
+        # print("Lose %: {:.2f}%".format(num_dealer_wins/num_runs*100))
+        # print("Push %: {:.2f}%".format(num_pushes/num_runs*100))
+        # print("Avg return per hand: ${:,.2f}".format(total_profit/num_runs))
+        # print()
+        # self.util.print_hand_strength_distribution(self.hand_strength_distribution, num_runs)
+        # print()
 
         return num_player_wins, num_dealer_wins, num_pushes, total_profit, self.bankroll, copy.deepcopy(self.hand_strength_distribution)
 
@@ -940,7 +938,6 @@ class Simulate:
         #raise 1x with at least 2 points
         elif points>=2:
             return 1
-            # bet_amount = self.bet_amount*3
         #Raise 1x with 6/5 suited
         elif sorted_player_hand[0][0]==5 and sorted_player_hand[1][0]==6 and sorted_player_hand[0][1]==sorted_player_hand[1][1]:
             return 1
